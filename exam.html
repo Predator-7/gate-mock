@@ -2,47 +2,145 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GATE CE Mock Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GATE CE Mock Test — TCS iON Digital Assessment</title>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/exam.css">
 <link rel="stylesheet" href="css/calculator.css">
 </head>
-<body>
+<body class="exam-body">
+
 <div id="exam-root">
-  <header class="exam-header">
-    <span id="paper-title-header" class="exam-title"></span>
-    <span class="exam-timer">Time Left: <strong id="timer-display">00:00:00</strong></span>
-    <button type="button" id="calc-open-btn" class="secondary-btn">Calculator</button>
-    <button type="button" id="submit-btn" class="danger-btn">Submit Test</button>
+  <!-- 1. Authentic TCS iON Top Blue Header Banner -->
+  <header class="ion-top-bar">
+    <div class="ion-exam-brand">
+      <span class="ion-gate-logo">GATE</span>
+      <span id="paper-title-header" class="ion-exam-title">GATE Civil Engineering Mock Test</span>
+    </div>
+    <div class="ion-candidate-block">
+      <div class="ion-candidate-info">
+        <span id="ion-candidate-name" class="ion-candidate-name">Candidate Name</span>
+        <span class="ion-candidate-meta">Subject: Civil Engineering | Lab Terminal: C001</span>
+      </div>
+      <div class="ion-candidate-photo" title="Candidate Profile Photo">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      </div>
+    </div>
   </header>
 
-  <nav id="section-tabs" class="section-tabs"></nav>
+  <!-- 2. Sub-Header Toolbar (Sections, Countdown Timer, Quick Tools) -->
+  <div class="ion-tool-bar">
+    <div class="ion-sections-wrapper">
+      <span class="ion-sections-label">Sections :</span>
+      <nav id="section-tabs" class="section-tabs"></nav>
+    </div>
+    <div class="ion-tools-right">
+      <div class="ion-timer-box" title="Remaining Examination Time">
+        <span>⏱ Time Left :</span>
+        <strong id="timer-display">03:00:00</strong>
+      </div>
+      <button type="button" id="calc-open-btn" class="ion-btn-tool" title="Open Official GATE Virtual Calculator">
+        🖩 Calculator
+      </button>
+      <button type="button" id="qpaper-btn" class="ion-btn-tool" title="View Full Question Paper">
+        📄 Question Paper
+      </button>
+      <button type="button" id="instructions-btn" class="ion-btn-tool" title="View Instructions">
+        ℹ Instructions
+      </button>
+      <a href="index.html" class="ion-btn-tool" style="color:#b91c1c;" title="Exit mock test">
+        ✕ Exit
+      </a>
+    </div>
+  </div>
 
+  <!-- 3. Main Screen Split: Question Workspace (Left) + Palette Sidebar (Right) -->
   <main class="exam-main">
+    <!-- Left: Question Panel -->
     <section class="question-panel">
       <div class="question-meta">
-        <span id="question-position"></span>
-        <span id="question-marks"></span>
+        <div class="question-meta-left">
+          <span id="question-position">Question No. 1</span>
+          <span id="question-type-badge" class="question-type-badge">Multiple Choice Question</span>
+        </div>
+        <div class="question-meta-right">
+          <span id="question-marks">1 mark (-0.33 if wrong)</span>
+          <span class="question-lang-select">View in : <strong>English</strong></span>
+        </div>
       </div>
-      <div id="question-container" class="question-container"></div>
+
+      <div class="question-scroll-area">
+        <div id="question-container" class="question-container"></div>
+      </div>
 
       <div class="question-actions">
-        <button type="button" id="save-next-btn" class="primary-btn">Save &amp; Next</button>
-        <button type="button" id="mark-review-btn" class="secondary-btn">Mark for Review &amp; Next</button>
-        <button type="button" id="clear-response-btn" class="secondary-btn">Clear Response</button>
+        <div class="actions-left">
+          <button type="button" id="mark-review-btn" class="secondary-btn">Mark for Review &amp; Next</button>
+          <button type="button" id="clear-response-btn" class="secondary-btn">Clear Response</button>
+        </div>
+        <div class="actions-right">
+          <button type="button" id="save-next-btn" class="primary-btn">Save &amp; Next</button>
+        </div>
       </div>
     </section>
 
+    <!-- Right: Authentic TCS iON Palette Sidebar -->
     <aside class="palette-panel">
-      <h3>Questions</h3>
-      <div id="palette-container" class="palette-grid"></div>
-      <ul class="legend-list small">
-        <li><span class="legend-swatch palette-not-visited"></span> Not visited <span id="count-not-visited" class="legend-count-badge">0</span></li>
-        <li><span class="legend-swatch palette-not-answered"></span> Not answered <span id="count-not-answered" class="legend-count-badge">0</span></li>
-        <li><span class="legend-swatch palette-answered"></span> Answered <span id="count-answered" class="legend-count-badge">0</span></li>
-        <li><span class="legend-swatch palette-marked-review"></span> Marked for review <span id="count-marked-review" class="legend-count-badge">0</span></li>
-        <li><span class="legend-swatch palette-answered-marked"></span> Answered &amp; marked <span id="count-answered-marked" class="legend-count-badge">0</span></li>
-      </ul>
+      <!-- Candidate Mini Profile -->
+      <div class="palette-candidate-box">
+        <div class="palette-avatar">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </div>
+        <div class="palette-cand-details">
+          <div id="palette-cand-name" class="palette-cand-name">Candidate Name</div>
+          <div class="palette-cand-roll">Roll No: 25CE1048 · Lab C</div>
+        </div>
+      </div>
+
+      <!-- Authentic TCS iON Legend Summary Grid (5 States) -->
+      <div class="palette-legend-container">
+        <div class="legend-grid-ion">
+          <div class="legend-item-ion">
+            <span class="legend-badge-ion badge-answered palette-answered"><span id="count-answered" class="legend-count-badge">0</span></span>
+            <span>Answered</span>
+          </div>
+          <div class="legend-item-ion">
+            <span class="legend-badge-ion badge-not-answered palette-not-answered"><span id="count-not-answered" class="legend-count-badge">0</span></span>
+            <span>Not Answered</span>
+          </div>
+          <div class="legend-item-ion">
+            <span class="legend-badge-ion badge-not-visited palette-not-visited"><span id="count-not-visited" class="legend-count-badge">0</span></span>
+            <span>Not Visited</span>
+          </div>
+          <div class="legend-item-ion">
+            <span class="legend-badge-ion badge-marked-review palette-marked-review"><span id="count-marked-review" class="legend-count-badge">0</span></span>
+            <span>Marked for Review</span>
+          </div>
+          <div class="legend-item-ion" style="grid-column: span 2;">
+            <span class="legend-badge-ion badge-answered-marked palette-answered-marked"><span id="count-answered-marked" class="legend-count-badge">0</span></span>
+            <span>Answered &amp; Marked (will be evaluated)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Title Header -->
+      <div id="palette-section-header" class="palette-section-header">
+        SECTION : GENERAL APTITUDE
+      </div>
+
+      <!-- Question Grid -->
+      <div class="palette-grid-wrapper">
+        <div id="palette-container" class="palette-grid"></div>
+      </div>
+
+      <!-- Bottom Palette Actions -->
+      <div class="palette-bottom-actions">
+        <div class="palette-secondary-buttons">
+          <button type="button" id="side-qpaper-btn" class="palette-sub-btn">Question Paper</button>
+          <button type="button" id="side-instructions-btn" class="palette-sub-btn">Instructions</button>
+        </div>
+        <button type="button" id="submit-btn" class="danger-btn">Submit Test</button>
+      </div>
     </aside>
   </main>
 </div>
@@ -50,6 +148,7 @@
 <div id="calculator-root"></div>
 <div id="modal-overlay" class="modal-overlay hidden"></div>
 
+<!-- Scripts -->
 <script src="js/config.js"></script>
 <script src="js/manifest.js"></script>
 <script src="js/utils.js"></script>
@@ -79,7 +178,6 @@
 <script src="js/question-renderer.js"></script>
 <script src="js/calculator.js"></script>
 <script src="js/scoring.js"></script>
-<script src="js/storage.js"></script>
 <script src="js/profile.js"></script>
 <script src="js/exam-page.js"></script>
 </body>
