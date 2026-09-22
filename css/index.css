@@ -1,0 +1,146 @@
+/* ── Site header override for index ─── */
+.index-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ── Hero Banner on Index ──────────────── */
+.index-hero {
+  background: linear-gradient(160deg, var(--surface) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 40px 28px 36px;
+  text-align: center;
+}
+
+.index-hero h2 {
+  font-size: clamp(24px, 4vw, 38px);
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  background: linear-gradient(120deg, var(--text), var(--accent-b));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.index-hero p {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0 0 20px 0;
+}
+
+.hero-cta-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.hero-cta-btn:hover { transform: translateY(-2px); }
+
+.hero-cta-btn--primary {
+  background: linear-gradient(135deg, var(--accent), #7986cb);
+  color: #fff;
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.hero-cta-btn--primary:hover { box-shadow: 0 8px 24px var(--accent-glow); }
+
+.hero-cta-btn--secondary {
+  background: rgba(255,202,40,0.1);
+  color: #ffca28;
+  border: 1px solid rgba(255,202,40,0.3);
+}
+.hero-cta-btn--secondary:hover { background: rgba(255,202,40,0.18); }
+
+/* ── Section Heading ──────────────────── */
+.index-main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 32px 24px 60px;
+}
+
+.index-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 16px 0;
+}
+
+/* ── Year Grid ─────────────────────────── */
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.year-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.year-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-b));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.year-card:hover {
+  border-color: var(--border2);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+  transform: translateY(-3px);
+}
+.year-card:hover::before { opacity: 1; }
+
+.year-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent-b);
+  margin-bottom: 6px;
+}
+
+.year-card-meta {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.year-card-tag {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}

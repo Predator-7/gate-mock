@@ -1,0 +1,163 @@
+/* ── Instructions page ─────────────────────────────── */
+.instructions-main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+}
+
+.instructions-intro {
+  text-align: center;
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+
+.instructions-intro h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.instructions-intro p {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.instructions-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 26px;
+  margin-bottom: 14px;
+  transition: border-color 0.15s;
+}
+
+.instructions-block:hover { border-color: var(--border2); }
+
+.instructions-block h2 {
+  margin: 0 0 14px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-b);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instructions-block h2::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.instructions-block ul {
+  margin: 0;
+  padding: 0 0 0 18px;
+}
+
+.instructions-block li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text2);
+}
+
+.instructions-block li strong { color: var(--text); }
+
+/* Marking scheme grid */
+.marking-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.marking-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+
+.marking-card-type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent-b);
+  margin-bottom: 6px;
+}
+
+.marking-card-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+/* Notice / resume */
+.notice {
+  background: rgba(255,179,0,0.08);
+  border: 1px solid rgba(255,179,0,0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #ffe082;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ack-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text2);
+  margin: 18px 0 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ack-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#start-btn {
+  width: 100%;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--accent), #7986cb);
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+#start-btn:not(:disabled):hover {
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--text); }
+.breadcrumb-sep { color: var(--border2); }
+.breadcrumb-current { color: var(--text2); }

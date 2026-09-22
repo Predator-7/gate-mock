@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GATE CE Mock Test</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/exam.css">
+<link rel="stylesheet" href="css/calculator.css">
+</head>
+<body>
+<div id="exam-root">
+  <header class="exam-header">
+    <span id="paper-title-header" class="exam-title"></span>
+    <span class="exam-timer">Time Left: <strong id="timer-display">00:00:00</strong></span>
+    <button type="button" id="calc-open-btn" class="secondary-btn">Calculator</button>
+    <button type="button" id="submit-btn" class="danger-btn">Submit Test</button>
+  </header>
+
+  <nav id="section-tabs" class="section-tabs"></nav>
+
+  <main class="exam-main">
+    <section class="question-panel">
+      <div class="question-meta">
+        <span id="question-position"></span>
+        <span id="question-marks"></span>
+      </div>
+      <div id="question-container" class="question-container"></div>
+
+      <div class="question-actions">
+        <button type="button" id="save-next-btn" class="primary-btn">Save &amp; Next</button>
+        <button type="button" id="mark-review-btn" class="secondary-btn">Mark for Review &amp; Next</button>
+        <button type="button" id="clear-response-btn" class="secondary-btn">Clear Response</button>
+      </div>
+    </section>
+
+    <aside class="palette-panel">
+      <h3>Questions</h3>
+      <div id="palette-container" class="palette-grid"></div>
+      <ul class="legend-list small">
+        <li><span class="legend-swatch palette-not-visited"></span> Not visited</li>
+        <li><span class="legend-swatch palette-not-answered"></span> Not answered</li>
+        <li><span class="legend-swatch palette-answered"></span> Answered</li>
+        <li><span class="legend-swatch palette-marked-review"></span> Marked for review</li>
+        <li><span class="legend-swatch palette-answered-marked"></span> Answered &amp; marked</li>
+      </ul>
+    </aside>
+  </main>
+</div>
+
+<div id="calculator-root"></div>
+<div id="modal-overlay" class="modal-overlay hidden"></div>
+
+<script src="js/config.js"></script>
+<script src="js/manifest.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/storage.js"></script>
+<script src="data/2015.js"></script>
+<script src="data/2017_ce1.js"></script>
+<script src="data/2017_ce2.js"></script>
+<script src="data/2018_ce1.js"></script>
+<script src="data/2018_ce2.js"></script>
+<script src="data/2019_ce1.js"></script>
+<script src="data/2019_ce2.js"></script>
+<script src="data/2020_ce1.js"></script>
+<script src="data/2020_ce2.js"></script>
+<script src="data/2021_ce1.js"></script>
+<script src="data/2021_ce2.js"></script>
+<script src="data/2022.js"></script>
+<script src="data/2023.js"></script>
+<script src="data/2024.js"></script>
+<script src="data/2025_ce1.js"></script>
+<script src="data/2025_ce2.js"></script>
+<script src="js/state.js"></script>
+<script src="js/timer.js"></script>
+<script src="js/palette.js"></script>
+<script src="js/renderers/render-mcq.js"></script>
+<script src="js/renderers/render-msq.js"></script>
+<script src="js/renderers/render-nat.js"></script>
+<script src="js/question-renderer.js"></script>
+<script src="js/calculator.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/exam-page.js"></script>
+</body>
+</html>

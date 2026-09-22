@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instructions — GATE CE Mock Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/instructions.css">
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="index.html" class="site-logo">
+      <span class="logo-icon">📚</span>
+      <h1>GATE CE</h1>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html"    class="site-nav-link active">Mock Tests</a>
+      <a href="practice.html" class="site-nav-link site-nav-link--practice">⚡ Practice</a>
+    </nav>
+  </div>
+</header>
+
+<div id="instructions-root">
+  <main class="instructions-main">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="index.html">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current" id="breadcrumb-paper">Mock Test</span>
+    </nav>
+
+    <div class="instructions-intro">
+      <h2 id="paper-title">GATE CE — Mock Test</h2>
+      <p>Duration: <strong id="paper-duration">180</strong> minutes · Read the instructions carefully before proceeding</p>
+    </div>
+
+    <!-- General Instructions -->
+    <section class="instructions-block">
+      <h2>General Instructions</h2>
+      <ul>
+        <li>Total duration of the examination is <strong id="paper-duration-2">180</strong> minutes.</li>
+        <li>A countdown timer in the header shows the remaining time. The test auto-submits when time expires.</li>
+        <li>Click <strong>Save &amp; Next</strong> to save your answer and move to the next question.</li>
+        <li>Click <strong>Mark for Review &amp; Next</strong> to flag a question for later review.</li>
+        <li>Click <strong>Clear Response</strong> to erase your answer for the current question.</li>
+        <li>Click any question number in the right-side palette to jump directly to that question.</li>
+      </ul>
+    </section>
+
+    <!-- Palette Legend -->
+    <section class="instructions-block">
+      <h2>Question Palette Legend</h2>
+      <ul class="legend-list">
+        <li><span class="legend-swatch palette-not-visited"></span> Not yet visited</li>
+        <li><span class="legend-swatch palette-not-answered"></span> Visited but not answered</li>
+        <li><span class="legend-swatch palette-answered"></span> Answered</li>
+        <li><span class="legend-swatch palette-marked-review"></span> Marked for review</li>
+        <li><span class="legend-swatch palette-answered-marked"></span> Answered &amp; marked for review</li>
+      </ul>
+    </section>
+
+    <!-- Marking Scheme -->
+    <section class="instructions-block">
+      <h2>Marking Scheme</h2>
+      <div class="marking-grid">
+        <div class="marking-card">
+          <div class="marking-card-type">MCQ</div>
+          <div class="marking-card-desc">Full marks for correct option. <strong>Negative marking</strong>: −⅓ marks for 1-mark Qs, −⅔ for 2-mark Qs. No marks for unattempted.</div>
+        </div>
+        <div class="marking-card">
+          <div class="marking-card-type">MSQ</div>
+          <div class="marking-card-desc">Full marks only if <strong>all</strong> correct options are selected and no incorrect ones. <strong>No negative marking.</strong></div>
+        </div>
+        <div class="marking-card">
+          <div class="marking-card-type">NAT</div>
+          <div class="marking-card-desc">Full marks if your value is within the accepted tolerance. <strong>No negative marking.</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Start Section -->
+    <section class="instructions-block">
+      <p id="resume-notice" class="hidden notice">
+        ⚠️ You have an in-progress attempt for this paper. Clicking Start will resume it.
+        <button type="button" id="start-fresh-btn" class="secondary-btn hidden">Start Fresh</button>
+      </p>
+      <label class="ack-row">
+        <input type="checkbox" id="ack-checkbox">
+        I have read and understood all the instructions above.
+      </label>
+      <button type="button" id="start-btn" class="primary-btn" disabled>Start Test →</button>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/manifest.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/scoring.js"></script>
+<script src="data/topics.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/onboarding.js"></script>
+<script src="js/instructions-page.js"></script>
+</body>
+</html>

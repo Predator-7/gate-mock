@@ -1,0 +1,251 @@
+/* ============================================================
+   GATE CE — Unified Design System (base.css)
+   Dark-premium theme applied globally
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── Design Tokens ─────────────────────────────────────────── */
+:root {
+  /* Core palette */
+  --bg:          #0e1117;
+  --surface:     #181c27;
+  --surface2:    #1f2436;
+  --surface3:    #262d40;
+  --border:      #2c3454;
+  --border2:     #384268;
+  --text:        #e8eaf6;
+  --text2:       #b0b8d4;
+  --muted:       #6b7ba4;
+
+  /* Accent */
+  --accent:      #5c6bc0;
+  --accent-b:    #7986cb;
+  --accent-glow: rgba(92,107,192,0.25);
+
+  /* Status */
+  --green:   #4caf50;
+  --red:     #ef5350;
+  --amber:   #ffb300;
+  --blue:    #42a5f5;
+
+  /* Legacy compat (exam/palette colors) */
+  --color-bg:           var(--bg);
+  --color-surface:      var(--surface);
+  --color-border:       var(--border);
+  --color-text:         var(--text);
+  --color-muted:        var(--muted);
+  --color-primary:      var(--accent);
+  --color-primary-dark: #3f51b5;
+  --color-danger:       var(--red);
+
+  --palette-not-visited:    #3a4060;
+  --palette-not-answered:   var(--red);
+  --palette-answered:       var(--green);
+  --palette-marked-review:  #7e57c2;
+  --palette-answered-marked: var(--green);
+
+  /* Spacing & geometry */
+  --radius:    12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+/* Year-card "Best score" badge (written by index-page.js) */
+.year-card-score {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  border: 1px solid rgba(76,175,80,0.35);
+  background: rgba(76,175,80,0.08);
+  border-radius: 99px;
+  padding: 2px 10px;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Shared Nav Header ──────────────────────────────────────── */
+.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.site-header .subtitle {
+  display: none; /* shown only on index */
+}
+
+.site-header-inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.site-logo h1 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.site-logo .logo-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* Site Nav */
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.site-nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.site-nav-link:hover { color: var(--text); background: var(--surface2); }
+.site-nav-link.active { color: var(--accent-b); background: var(--accent-glow); border-color: var(--border2); }
+
+.site-nav-link--practice {
+  color: #ffca28;
+  background: rgba(255,202,40,0.08);
+  border-color: rgba(255,202,40,0.25);
+}
+.site-nav-link--practice:hover {
+  background: rgba(255,202,40,0.15);
+  color: #ffe082;
+}
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.primary-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 9px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  font-family: inherit;
+}
+.primary-btn:hover:not(:disabled) {
+  background: var(--accent-b);
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.primary-btn:disabled { background: var(--surface3); color: var(--muted); cursor: not-allowed; }
+
+.secondary-btn {
+  background: var(--surface2);
+  color: var(--text2);
+  border: 1px solid var(--border2);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+.secondary-btn:hover { background: var(--surface3); color: var(--text); border-color: var(--border2); }
+
+.danger-btn {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+.danger-btn:hover { opacity: 0.87; }
+
+/* ── Utilities ──────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* Question palette legend */
+.legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.legend-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text2);
+}
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.legend-list.small .legend-swatch { width: 12px; height: 12px; }
+
+.palette-not-visited  { background: var(--palette-not-visited); }
+.palette-not-answered { background: var(--palette-not-answered); }
+.palette-answered     { background: var(--palette-answered); }
+.palette-marked-review { background: var(--palette-marked-review); }
+.palette-answered-marked {
+  background: var(--palette-answered-marked);
+  position: relative;
+}

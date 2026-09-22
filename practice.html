@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Mode — GATE CE Mock Tests</title>
+<meta name="description" content="Practice GATE Civil Engineering questions topic-wise. Select multiple topics and years to build a custom practice set.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/practice.css">
+</head>
+<body>
+
+<header class="practice-hero">
+  <nav class="practice-nav">
+    <a href="index.html" class="nav-logo">
+      <span class="logo-icon">📚</span>
+      <span>GATE CE</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Mock Tests</a>
+      <a href="practice.html" class="nav-link active">Practice</a>
+      <a href="profile.html" class="nav-link">Progress</a>
+    </div>
+  </nav>
+  <div class="hero-content">
+    <div class="hero-badge">Topic-wise Practice</div>
+    <h1 class="hero-title">Practice Smarter,<br>Score Higher</h1>
+    <p class="hero-subtitle">Select topics you want to practice. Mix years. Get instant feedback. Build exam-ready confidence.</p>
+    <div class="hero-stats" id="hero-stats">
+      <div class="stat-chip"><span class="stat-num" id="stat-total-q">—</span> Questions</div>
+      <div class="stat-chip"><span class="stat-num">15</span> Topics</div>
+      <div class="stat-chip"><span class="stat-num">9</span> Years</div>
+    </div>
+  </div>
+</header>
+
+<main class="practice-main">
+
+  <!-- ── Topic Selection ── -->
+  <section class="config-section">
+    <div class="section-header">
+      <h2 class="section-title">Choose Topics</h2>
+      <div class="section-actions">
+        <button type="button" id="select-all-btn" class="pill-btn">Select All</button>
+        <button type="button" id="clear-all-btn" class="pill-btn pill-btn--ghost">Clear All</button>
+      </div>
+    </div>
+    <div id="topic-grid" class="topic-grid"></div>
+  </section>
+
+  <!-- ── Year Filter ── -->
+  <section class="config-section">
+    <div class="section-header">
+      <h2 class="section-title">Choose Years</h2>
+      <div class="section-actions">
+        <button type="button" id="years-all-btn" class="pill-btn">All Years</button>
+      </div>
+    </div>
+    <div id="year-chips" class="year-chips"></div>
+  </section>
+
+  <!-- ── Options ── -->
+  <section class="config-section options-row">
+    <label class="toggle-label" id="shuffle-label">
+      <div class="toggle-track" id="shuffle-toggle">
+        <div class="toggle-thumb"></div>
+      </div>
+      <div>
+        <span class="toggle-title">Shuffle Questions</span>
+        <span class="toggle-sub">Mix questions randomly across topics and years</span>
+      </div>
+    </label>
+    <label class="toggle-label" id="show-topic-label">
+      <div class="toggle-track active" id="show-topic-toggle">
+        <div class="toggle-thumb"></div>
+      </div>
+      <div>
+        <span class="toggle-title">Show Topic Tags</span>
+        <span class="toggle-sub">Display topic & year badge on each question</span>
+      </div>
+    </label>
+  </section>
+
+  <!-- ── Start Bar ── -->
+  <div class="start-bar" id="start-bar">
+    <div class="start-summary" id="start-summary">
+      <span class="summary-count" id="summary-count">0</span>
+      <span class="summary-label">questions ready</span>
+    </div>
+    <button type="button" id="start-practice-btn" class="start-btn" disabled>
+      Start Practice →
+    </button>
+  </div>
+
+</main>
+
+<!-- All data files -->
+<script src="js/config.js"></script>
+<script src="js/manifest.js"></script>
+<script src="js/utils.js"></script>
+<script src="data/topics.js"></script>
+<script src="data/2015.js"></script>
+<script src="data/2017_ce1.js"></script>
+<script src="data/2017_ce2.js"></script>
+<script src="data/2018_ce1.js"></script>
+<script src="data/2018_ce2.js"></script>
+<script src="data/2019_ce1.js"></script>
+<script src="data/2019_ce2.js"></script>
+<script src="data/2020_ce1.js"></script>
+<script src="data/2020_ce2.js"></script>
+<script src="data/2021_ce1.js"></script>
+<script src="data/2021_ce2.js"></script>
+<script src="data/2022.js"></script>
+<script src="data/2023.js"></script>
+<script src="data/2024.js"></script>
+<script src="data/2025_ce1.js"></script>
+<script src="data/2025_ce2.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/onboarding.js"></script>
+<script src="js/practice.js"></script>
+<script src="js/practice-page.js"></script>
+</body>
+</html>

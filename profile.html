@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile &amp; Progress — GATE CE</title>
+<meta name="description" content="Your GATE Civil Engineering preparation dashboard — mock test history, practice sessions and topic-wise mastery.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <a href="index.html" class="site-logo">
+      <span class="logo-icon">📚</span>
+      <h1>GATE CE</h1>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html"    class="site-nav-link">Mock Tests</a>
+      <a href="practice.html" class="site-nav-link site-nav-link--practice">⚡ Practice</a>
+      <a href="profile.html"  class="site-nav-link active">Progress</a>
+    </nav>
+  </div>
+</header>
+
+<main class="profile-main">
+
+  <!-- ── Identity ── -->
+  <section class="profile-hero">
+    <div class="avatar-lg" id="avatar-lg">?</div>
+    <div class="profile-identity">
+      <div class="profile-name-row">
+        <h2 class="profile-name" id="profile-name">Your Name</h2>
+        <button type="button" class="ghost-btn" id="edit-name-btn">Edit</button>
+      </div>
+      <div class="profile-name-edit hidden" id="profile-name-edit">
+        <input id="name-input" class="name-input" type="text" maxlength="40" placeholder="Your name" autocomplete="name">
+        <button type="button" class="primary-btn" id="save-name-btn">Save</button>
+        <button type="button" class="secondary-btn" id="cancel-name-btn">Cancel</button>
+      </div>
+      <p class="profile-sub" id="profile-sub">Your progress is stored locally in this browser.</p>
+    </div>
+    <div class="profile-actions">
+      <a href="index.html" class="secondary-btn">Take a Mock Test</a>
+      <a href="practice.html" class="secondary-btn">Practice Topics</a>
+    </div>
+  </section>
+
+  <!-- ── KPI cards ── -->
+  <section class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-value" id="kpi-accuracy">—</div>
+      <div class="kpi-label">Combined Accuracy</div>
+      <div class="kpi-foot" id="kpi-accuracy-foot">&nbsp;</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value" id="kpi-mocks">0</div>
+      <div class="kpi-label">Mock Tests</div>
+      <div class="kpi-foot" id="kpi-mocks-foot">&nbsp;</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value" id="kpi-practice">0</div>
+      <div class="kpi-label">Practice Questions</div>
+      <div class="kpi-foot" id="kpi-practice-foot">&nbsp;</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value" id="kpi-best">—</div>
+      <div class="kpi-label">Best Score</div>
+      <div class="kpi-foot" id="kpi-best-foot">&nbsp;</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-value" id="kpi-avg">—</div>
+      <div class="kpi-label">Average Score</div>
+      <div class="kpi-foot" id="kpi-avg-foot">&nbsp;</div>
+    </div>
+  </section>
+
+  <!-- ── Topic mastery ── -->
+  <section class="panel">
+    <div class="panel-header">
+      <h3 class="panel-title">Civil Engineering Topic Mastery</h3>
+      <span class="panel-hint">Accuracy across mocks &amp; practice</span>
+    </div>
+    <div class="mastery-list" id="mastery-list"></div>
+  </section>
+
+  <!-- ── History ── -->
+  <section class="panel">
+    <div class="panel-header">
+      <h3 class="panel-title">History</h3>
+      <div class="tab-row">
+        <button type="button" class="tab-btn active" data-tab="mock">Mock Tests</button>
+        <button type="button" class="tab-btn" data-tab="practice">Practice</button>
+      </div>
+    </div>
+
+    <div id="tab-mock" class="tab-panel">
+      <div id="mock-list" class="history-list"></div>
+    </div>
+    <div id="tab-practice" class="tab-panel hidden">
+      <div id="practice-list" class="history-list"></div>
+    </div>
+  </section>
+
+  <!-- ── Data management ── -->
+  <section class="panel panel--data">
+    <div class="panel-header">
+      <h3 class="panel-title">Data Management</h3>
+    </div>
+    <div class="data-row">
+      <div>
+        <div class="data-title">Export progress</div>
+        <div class="data-sub">Download a JSON backup of your profile and history.</div>
+      </div>
+      <button type="button" class="secondary-btn" id="export-btn">Export JSON</button>
+    </div>
+    <div class="data-row">
+      <div>
+        <div class="data-title">Import progress</div>
+        <div class="data-sub">Restore from a JSON backup. This replaces the progress stored in this browser.</div>
+      </div>
+      <button type="button" class="secondary-btn" id="import-btn">Import JSON</button>
+      <input type="file" id="import-file" accept="application/json,.json" class="hidden">
+    </div>
+    <div class="data-row">
+      <div>
+        <div class="data-title">Reset progress</div>
+        <div class="data-sub">Permanently delete your profile, mock results and practice history.</div>
+      </div>
+      <button type="button" class="danger-btn" id="reset-btn">Reset</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="js/config.js"></script>
+<script src="js/manifest.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/scoring.js"></script>
+<script src="data/topics.js"></script>
+<script src="data/2015.js"></script>
+<script src="data/2017_ce1.js"></script>
+<script src="data/2017_ce2.js"></script>
+<script src="data/2018_ce1.js"></script>
+<script src="data/2018_ce2.js"></script>
+<script src="data/2019_ce1.js"></script>
+<script src="data/2019_ce2.js"></script>
+<script src="data/2020_ce1.js"></script>
+<script src="data/2020_ce2.js"></script>
+<script src="data/2021_ce1.js"></script>
+<script src="data/2021_ce2.js"></script>
+<script src="data/2022.js"></script>
+<script src="data/2023.js"></script>
+<script src="data/2024.js"></script>
+<script src="data/2025_ce1.js"></script>
+<script src="data/2025_ce2.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/onboarding.js"></script>
+<script src="js/profile-page.js"></script>
+</body>
+</html>

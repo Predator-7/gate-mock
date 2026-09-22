@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Exam — GATE CE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/practice.css">
+<link rel="stylesheet" href="css/exam.css">
+</head>
+<body class="practice-exam-body">
+
+<!-- Top Bar -->
+<header class="pexam-header">
+  <div class="pexam-header-left">
+    <a href="practice.html" class="back-link">← Back to Practice</a>
+    <div class="pexam-title" id="pexam-title">Practice Session</div>
+  </div>
+  <div class="pexam-progress-wrap">
+    <div class="pexam-progress-bar">
+      <div class="pexam-progress-fill" id="pexam-progress-fill"></div>
+    </div>
+    <div class="pexam-progress-label" id="pexam-progress-label">0 / 0</div>
+  </div>
+  <div class="pexam-header-right">
+    <div class="pexam-score-badge" id="pexam-score-badge">
+      <span class="score-correct" id="score-correct">0</span>
+      <span class="score-sep">·</span>
+      <span class="score-wrong" id="score-wrong">0</span>
+    </div>
+    <button type="button" id="finish-btn" class="finish-btn">Finish</button>
+  </div>
+</header>
+
+<!-- Main Area -->
+<div class="pexam-layout" id="pexam-layout">
+
+  <!-- Question Panel -->
+  <main class="pexam-question-panel" id="pexam-question-panel">
+
+    <div class="question-meta-bar">
+      <span class="qmeta-pos" id="qmeta-pos"></span>
+      <div class="qmeta-badges" id="qmeta-badges"></div>
+      <span class="qmeta-marks" id="qmeta-marks"></span>
+    </div>
+
+    <div id="pexam-question-container" class="question-container pexam-question-container"></div>
+
+    <!-- Action Row -->
+    <div class="pexam-actions" id="pexam-actions">
+      <div class="action-left">
+        <button type="button" id="prev-btn" class="action-btn action-btn--ghost">← Prev</button>
+      </div>
+      <div class="action-center">
+        <button type="button" id="check-btn" class="action-btn action-btn--primary">Check Answer</button>
+        <button type="button" id="next-btn" class="action-btn action-btn--secondary hidden">Next →</button>
+      </div>
+      <div class="action-right">
+        <button type="button" id="skip-btn" class="action-btn action-btn--ghost">Skip</button>
+      </div>
+    </div>
+
+    <!-- Answer Reveal Panel -->
+    <div class="answer-reveal" id="answer-reveal">
+      <div class="reveal-verdict" id="reveal-verdict"></div>
+      <div class="reveal-body">
+        <div class="reveal-row">
+          <span class="reveal-label">Your answer:</span>
+          <span class="reveal-val" id="reveal-your-ans"></span>
+        </div>
+        <div class="reveal-row">
+          <span class="reveal-label">Correct answer:</span>
+          <span class="reveal-val reveal-correct" id="reveal-correct-ans"></span>
+        </div>
+        <div class="reveal-row">
+          <span class="reveal-label">Marks:</span>
+          <span class="reveal-val" id="reveal-marks"></span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Sidebar: Question Map -->
+  <aside class="pexam-sidebar" id="pexam-sidebar">
+    <div class="sidebar-title">Questions</div>
+    <div class="pexam-legend">
+      <span class="legend-dot legend-dot--unattempted"></span> Unattempted
+      <span class="legend-dot legend-dot--correct"></span> Correct
+      <span class="legend-dot legend-dot--wrong"></span> Wrong
+      <span class="legend-dot legend-dot--skipped"></span> Skipped
+    </div>
+    <div id="pexam-palette" class="pexam-palette"></div>
+  </aside>
+
+</div>
+
+<!-- Summary Modal -->
+<div class="summary-overlay hidden" id="summary-overlay">
+  <div class="summary-modal">
+    <div class="summary-header">
+      <div class="summary-icon" id="summary-icon">🎯</div>
+      <h2 class="summary-title">Practice Complete!</h2>
+    </div>
+    <div class="summary-scorecard">
+      <div class="summary-tile summary-tile--correct">
+        <div class="summary-tile-num" id="sum-correct">0</div>
+        <div class="summary-tile-lbl">Correct</div>
+      </div>
+      <div class="summary-tile summary-tile--wrong">
+        <div class="summary-tile-num" id="sum-wrong">0</div>
+        <div class="summary-tile-lbl">Wrong</div>
+      </div>
+      <div class="summary-tile summary-tile--skipped">
+        <div class="summary-tile-num" id="sum-skipped">0</div>
+        <div class="summary-tile-lbl">Skipped</div>
+      </div>
+      <div class="summary-tile summary-tile--score">
+        <div class="summary-tile-num" id="sum-score">0</div>
+        <div class="summary-tile-lbl">Score</div>
+      </div>
+    </div>
+
+    <div class="summary-topics" id="summary-topics"></div>
+
+    <div class="summary-actions">
+      <button type="button" id="review-btn" class="action-btn action-btn--secondary">Review Answers</button>
+      <a href="practice.html" class="action-btn action-btn--primary">New Practice →</a>
+    </div>
+  </div>
+</div>
+
+<!-- All data files -->
+<script src="js/config.js"></script>
+<script src="js/manifest.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/scoring.js"></script>
+<script src="data/topics.js"></script>
+<script src="data/2015.js"></script>
+<script src="data/2017_ce1.js"></script>
+<script src="data/2017_ce2.js"></script>
+<script src="data/2018_ce1.js"></script>
+<script src="data/2018_ce2.js"></script>
+<script src="data/2019_ce1.js"></script>
+<script src="data/2019_ce2.js"></script>
+<script src="data/2020_ce1.js"></script>
+<script src="data/2020_ce2.js"></script>
+<script src="data/2021_ce1.js"></script>
+<script src="data/2021_ce2.js"></script>
+<script src="data/2022.js"></script>
+<script src="data/2023.js"></script>
+<script src="data/2024.js"></script>
+<script src="data/2025_ce1.js"></script>
+<script src="data/2025_ce2.js"></script>
+<script src="js/practice.js"></script>
+<script src="js/renderers/render-mcq.js"></script>
+<script src="js/renderers/render-msq.js"></script>
+<script src="js/renderers/render-nat.js"></script>
+<script src="js/question-renderer.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/profile.js"></script>
+<script src="js/onboarding.js"></script>
+<script src="js/practice-exam-page.js"></script>
+</body>
+</html>

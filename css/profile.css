@@ -1,0 +1,325 @@
+/* ============================================================
+   GATE CE — Profile & Progress
+   ============================================================ */
+
+.profile-main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 28px 24px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Identity hero ── */
+.profile-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
+
+.avatar-lg {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--accent);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.profile-identity { flex: 1; min-width: 200px; }
+
+.profile-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.profile-name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.profile-sub { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+
+.profile-name-edit { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+
+.name-input {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 9px 13px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: inherit;
+  outline: none;
+  min-width: 220px;
+}
+
+.name-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+.ghost-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+
+.ghost-btn:hover { border-color: var(--accent); color: var(--text); background: var(--surface3); }
+
+.profile-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ── KPI cards ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color .15s, transform .15s;
+}
+
+.kpi-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.kpi-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.kpi-foot { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+/* ── Panels ── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.panel-title { margin: 0; font-size: 16px; font-weight: 700; color: var(--text); }
+.panel-hint { font-size: 12px; color: var(--muted); }
+
+/* ── Topic mastery ── */
+.mastery-list { display: flex; flex-direction: column; gap: 14px; }
+
+.mastery-row {
+  display: grid;
+  grid-template-columns: 30px minmax(150px, 220px) 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.mastery-icon { font-size: 17px; text-align: center; }
+
+.mastery-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mastery-track {
+  height: 9px;
+  background: var(--surface3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.mastery-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }
+
+.mastery-pct {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 42px;
+  text-align: right;
+}
+
+.mastery-count { font-size: 11.5px; color: var(--muted); min-width: 58px; text-align: right; }
+
+.mastery-practice {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-b);
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  padding: 3px 10px;
+  white-space: nowrap;
+  transition: border-color .15s, color .15s, background .15s;
+}
+
+.mastery-practice:hover { border-color: var(--accent); color: var(--text); background: var(--surface3); }
+
+.mastery-row--empty .mastery-name,
+.mastery-row--empty .mastery-pct { color: var(--muted); font-weight: 500; }
+
+/* ── Tabs ── */
+.tab-row {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 3px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active { background: var(--accent); color: #fff; }
+
+/* ── History lists ── */
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  transition: border-color .15s;
+}
+
+.history-item:hover { border-color: var(--border2); }
+
+.hi-main { flex: 1; min-width: 170px; }
+.hi-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.hi-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+.hi-score {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.hi-score span { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+.hi-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  white-space: nowrap;
+}
+
+.pill--correct { color: var(--green); border-color: rgba(76,175,80,.35); background: rgba(76,175,80,.08); }
+.pill--wrong   { color: var(--red);   border-color: rgba(239,83,80,.35);  background: rgba(239,83,80,.08); }
+.pill--skip    { color: var(--muted); }
+
+.hi-actions { display: flex; gap: 8px; }
+
+.review-btn {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-b);
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  padding: 5px 14px;
+  white-space: nowrap;
+  transition: border-color .15s, color .15s, background .15s;
+}
+
+.review-btn:hover { border-color: var(--accent); color: var(--text); background: var(--surface3); }
+
+.empty-note {
+  padding: 28px 8px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.empty-note a { color: var(--accent-b); }
+
+/* ── Data management ── */
+.panel--data .data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+}
+
+.panel--data .data-row:first-of-type { border-top: none; padding-top: 0; }
+.data-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.data-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* reuses .primary-btn / .secondary-btn / .danger-btn from base.css */
+.primary-btn, .secondary-btn, .danger-btn { font-family: inherit; }
+
+@media (max-width: 720px) {
+  .profile-main { padding: 20px 16px 56px; }
+  .mastery-row { grid-template-columns: 26px 1fr auto; grid-row-gap: 6px; }
+  .mastery-practice { grid-column: 2 / -1; justify-self: start; }
+  .profile-actions { width: 100%; }
+}
