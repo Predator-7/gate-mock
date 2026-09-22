@@ -30,6 +30,25 @@ Open your browser and navigate to: **`http://localhost:8080`**
 
 ---
 
+## 🌐 Deploying to GitHub Pages (Free Cloud Hosting)
+
+Because this platform is built with 100% pure client-side web technologies (HTML5, CSS3, Vanilla JavaScript), it can be deployed directly to **GitHub Pages** with zero setup or build steps:
+
+1. Go to your repository on GitHub: [https://github.com/Predator-7/gate-mock](https://github.com/Predator-7/gate-mock)
+2. Click on the **Settings** tab at the top.
+3. In the left sidebar, select **Pages** (under *Code and automation*).
+4. Under **Build and deployment**:
+   - **Source**: Choose `Deploy from a branch`
+   - **Branch**: Choose `main` and folder `/ (root)`
+   - Click **Save**.
+5. After 1–2 minutes, your live site will be active at:
+   **`https://predator-7.github.io/gate-mock/`**
+
+> [!TIP]
+> **How Progress Works on GitHub Pages**: All test scores, practice sessions, and topic mastery are saved locally in your browser's persistent `localStorage`. You can click **Backup / Export JSON** on the Profile page anytime to download a backup file or transfer your data across different devices or browsers.
+
+---
+
 ## 💾 How User Data is Saved (File Persistence)
 
 - **Physical File Storage (`userData.json`)**: Whenever you submit a mock test, complete a practice session, or update your name, the app automatically writes your updated records directly to `userData.json` on your computer.
