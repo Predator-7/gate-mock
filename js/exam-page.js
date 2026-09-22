@@ -20,11 +20,13 @@
     renderAll();
 
     document.getElementById("save-next-btn").addEventListener("click", function () {
+      var q = window.GateState.getCurrentQuestion();
+      if (q) window.GateState.unmarkForReview(q.id);
       goNext();
     });
     document.getElementById("mark-review-btn").addEventListener("click", function () {
       var q = window.GateState.getCurrentQuestion();
-      window.GateState.toggleMarkForReview(q.id);
+      if (q) window.GateState.markForReview(q.id);
       goNext();
     });
     document.getElementById("clear-response-btn").addEventListener("click", function () {
@@ -156,6 +158,26 @@
     renderPaletteOnly();
   }
 
+  function updateLegendCounts() {
+    var counts = {
+      "not-visited": 0,
+      "not-answered": 0,
+      "answered": 0,
+      "marked-review": 0,
+      "answered-marked": 0
+    };
+    if (paper && paper.questions) {
+      paper.questions.forEach(function (q) {
+        var s = window.GateState.getPaletteState(q.id);
+        if (counts[s] !== undefined) counts[s]++;
+      });
+    }
+    for (var key in counts) {
+      var el = document.getElementById("count-" + key);
+      if (el) el.textContent = String(counts[key]);
+    }
+  }
+
   function renderPaletteOnly() {
     var state = window.GateState.getState();
     var sectionQuestions = window.GateState.getQuestionsInSection(state.currentSection);
@@ -168,5 +190,6 @@
         renderAll();
       }
     );
+    updateLegendCounts();
   }
 })();

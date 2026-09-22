@@ -108,6 +108,21 @@
     persist();
   }
 
+  function markForReview(qid) {
+    var r = current.responses[qid];
+    if (!r) return;
+    r.markedForReview = true;
+    r.visited = true;
+    persist();
+  }
+
+  function unmarkForReview(qid) {
+    var r = current.responses[qid];
+    if (!r) return;
+    r.markedForReview = false;
+    persist();
+  }
+
   function toggleMarkForReview(qid) {
     var r = current.responses[qid];
     if (!r) return;
@@ -138,6 +153,8 @@
     switchSection: switchSection,
     setResponse: setResponse,
     clearResponse: clearResponse,
+    markForReview: markForReview,
+    unmarkForReview: unmarkForReview,
     toggleMarkForReview: toggleMarkForReview,
     getPaletteState: getPaletteState,
     finalizeAndClear: finalizeAndClear
