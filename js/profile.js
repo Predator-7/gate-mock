@@ -17,12 +17,85 @@
     }
   }
 
+  /* ── Request Persistent Storage Permission from Browser ── */
+  if (typeof navigator !== "undefined" && navigator.storage && navigator.storage.persist) {
+    navigator.storage.persist().catch(function () {});
+  }
+
+  /* ── IndexedDB Vault Mirroring (Secondary Browser Storage Layer) ── */
+  var idbReq = null;
+  function getIDB() {
+    if (typeof indexedDB === "undefined") return null;
+    if (!idbReq) {
+      try {
+        idbReq = indexedDB.open("gate_mock_vault", 1);
+        idbReq.onupgradeneeded = function (e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains("store")) {
+            db.createObjectStore("store", { keyPath: "key" });
+          }
+        };
+      } catch(e) {
+        idbReq = null;
+      }
+    }
+    return idbReq;
+  }
+
+  function mirrorToIDB(k, v) {
+    var req = getIDB();
+    if (!req) return;
+    try {
+      if (req.result) {
+        var tx = req.result.transaction("store", "readwrite");
+        tx.objectStore("store").put({ key: k, value: v, updatedAt: Date.now() });
+      } else {
+        req.addEventListener("success", function () {
+          try {
+            var tx = req.result.transaction("store", "readwrite");
+            tx.objectStore("store").put({ key: k, value: v, updatedAt: Date.now() });
+          } catch(e) {}
+        });
+      }
+    } catch(e) {}
+  }
+
+  function restoreFromIDB() {
+    var req = getIDB();
+    if (!req) return;
+    function doRead(db) {
+      try {
+        var tx = db.transaction("store", "readonly");
+        var store = tx.objectStore("store");
+        if (!store.getAll) return;
+        var getAllReq = store.getAll();
+        getAllReq.onsuccess = function () {
+          var rows = getAllReq.result || [];
+          rows.forEach(function (row) {
+            if (row && row.key && row.value && !safeGet(row.key)) {
+              safeSet(row.key, row.value);
+            }
+          });
+        };
+      } catch(e) {}
+    }
+    if (req.result) {
+      doRead(req.result);
+    } else {
+      req.addEventListener("success", function () {
+        doRead(req.result);
+      });
+    }
+  }
+
   function safeSet(k, v) {
     try {
       localStorage.setItem(k, JSON.stringify(v));
+      mirrorToIDB(k, v);
       return true;
     } catch(e) {
       console.warn("GateProfile: failed writing", k, e);
+      mirrorToIDB(k, v);
       return false;
     }
   }
@@ -679,11 +752,14 @@
   }
 
   // Automatic sync on window boot
-  if (typeof window !== "undefined" && typeof document !== "undefined" && typeof fetch === "function") {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", function () { syncWithDisk(); });
-    } else if (typeof setTimeout === "function") {
-      setTimeout(function () { syncWithDisk(); }, 0);
+  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    restoreFromIDB();
+    if (typeof fetch === "function") {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { syncWithDisk(); });
+      } else if (typeof setTimeout === "function") {
+        setTimeout(function () { syncWithDisk(); }, 0);
+      }
     }
   }
 

@@ -88,6 +88,15 @@
 
       reviewList.appendChild(item);
     });
+
+    var backupBtn = document.getElementById("download-backup-btn");
+    if (backupBtn) {
+      backupBtn.addEventListener("click", function () {
+        if (window.GateProfile && window.GateProfile.exportAllData) {
+          window.GateProfile.exportAllData();
+        }
+      });
+    }
   });
 
   function totalMarks(paper) {
