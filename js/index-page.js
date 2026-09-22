@@ -65,10 +65,20 @@
     sub.textContent = "Civil Engineering · " + bits.join(" and ") + " completed";
   }
 
+  window.addEventListener("gate:profileUpdated", renderGreeting);
+
   function bestAttempt(year) {
     if (!window.GateProfile) return null;
     var attempts = window.GateProfile.loadMockHistory().filter(function (m) { return m.year === year; });
-    if (!attempts.length) return null;
+    if (!attempts.length) {
+      try {
+        var r = JSON.parse(localStorage.getItem("gate-result-" + year));
+        if (r && (r.totalScore != null || r.score != null)) {
+          return { score: r.totalScore != null ? r.totalScore : r.score, maxScore: r.maxScore || 100 };
+        }
+      } catch(e) {}
+      return null;
+    }
     return attempts.reduce(function (best, m) { return m.score > best.score ? m : best; }, attempts[0]);
   }
 

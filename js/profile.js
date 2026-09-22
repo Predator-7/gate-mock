@@ -57,27 +57,119 @@
   ══════════════════════════════════════════ */
 
   function loadMockHistory() {
-    return safeGet(MOCK_HIST_KEY) || [];
+    var history = safeGet(MOCK_HIST_KEY) || [];
+    var existingKeys = {};
+    history.forEach(function (h) {
+      if (h.year) existingKeys[h.year] = true;
+    });
+
+    var added = false;
+    var manifest = window.GATE_MANIFEST || [];
+
+    /* Check for stored results in GateStorage / localStorage */
+    manifest.forEach(function (entry) {
+      var key = entry.year;
+      if (!existingKeys[key]) {
+        var r = (window.GateStorage && window.GateStorage.loadResult) ?
+                window.GateStorage.loadResult(key) :
+                safeGet("gate-result-" + key);
+        if (r && (r.totalScore != null || r.score != null || r.submittedAt)) {
+          var subAt = r.submittedAt || null;
+          var item = {
+            id: "mock_legacy_" + key + "_" + (subAt || Date.now()),
+            type: "mock",
+            year: key,
+            label: entry.label || ("GATE CE " + key),
+            score: Number(r.totalScore != null ? r.totalScore : (r.score || 0)),
+            maxScore: Number(r.maxScore || 100),
+            correct: Number(r.totalCorrect != null ? r.totalCorrect : (r.correct || 0)),
+            wrong: Number(r.totalWrong != null ? r.totalWrong : (r.wrong || 0)),
+            unattempted: Number(r.totalUnattempted != null ? r.totalUnattempted : (r.unattempted || 0)),
+            submittedAt: subAt,
+            perQuestion: Array.isArray(r.perQuestion) ? r.perQuestion.slice() : []
+          };
+          item.total = item.correct + item.wrong + item.unattempted;
+          item.percentage = item.maxScore > 0 ? ((item.score / item.maxScore) * 100).toFixed(1) : "0.0";
+          history.push(item);
+          existingKeys[key] = true;
+          added = true;
+        }
+      }
+    });
+
+    // Also scan any gate-result-<year> in localStorage not in manifest
+    try {
+      if (typeof localStorage !== "undefined" && localStorage.length) {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && k.indexOf("gate-result-") === 0) {
+            var y = k.replace("gate-result-", "");
+            if (!existingKeys[y]) {
+              var r2 = safeGet(k);
+              if (r2 && (r2.totalScore != null || r2.score != null || r2.submittedAt)) {
+                var mEntry = manifest.find(function(m){ return m.year === y; });
+                var item2 = {
+                  id: "mock_legacy_" + y + "_" + (r2.submittedAt || Date.now()),
+                  type: "mock",
+                  year: y,
+                  label: mEntry ? mEntry.label : ("GATE CE " + y),
+                  score: Number(r2.totalScore != null ? r2.totalScore : (r2.score || 0)),
+                  maxScore: Number(r2.maxScore || 100),
+                  correct: Number(r2.totalCorrect != null ? r2.totalCorrect : (r2.correct || 0)),
+                  wrong: Number(r2.totalWrong != null ? r2.totalWrong : (r2.wrong || 0)),
+                  unattempted: Number(r2.totalUnattempted != null ? r2.totalUnattempted : (r2.unattempted || 0)),
+                  submittedAt: r2.submittedAt || null,
+                  perQuestion: Array.isArray(r2.perQuestion) ? r2.perQuestion.slice() : []
+                };
+                item2.total = item2.correct + item2.wrong + item2.unattempted;
+                item2.percentage = item2.maxScore > 0 ? ((item2.score / item2.maxScore) * 100).toFixed(1) : "0.0";
+                history.push(item2);
+                existingKeys[y] = true;
+                added = true;
+              }
+            }
+          }
+        }
+      }
+    } catch(e) {}
+
+    if (added) {
+      safeSet(MOCK_HIST_KEY, history);
+    }
+    return history;
   }
 
   function recordMockResult(year, label, result) {
     if (typeof label === "object" && !result) {
       result = label;
-      label = "GATE " + year;
+      label = null;
     }
     result = result || {};
-    var history = loadMockHistory();
+
+    var history = safeGet(MOCK_HIST_KEY) || [];
+
+    // Guard duplicate submit: check same paper & submittedAt
+    var subAt = result.submittedAt || Date.now();
+    var isDuplicate = history.some(function(h) {
+      return h.year === year && h.submittedAt === subAt;
+    });
+    if (isDuplicate) return history[0];
+
+    var manifestEntry = (window.GATE_MANIFEST || []).find(function(m) { return m.year === year; });
+    var finalLabel = label || (manifestEntry ? manifestEntry.label : ("GATE CE " + year));
+
     var entry = {
       id: "mock_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
       type: "mock",
       year: year,
-      label: label || ("GATE " + year),
+      label: finalLabel,
       score: Number(result.totalScore != null ? result.totalScore : (result.score || 0)),
       maxScore: Number(result.maxScore || 100),
       correct: Number(result.totalCorrect != null ? result.totalCorrect : (result.correct || 0)),
       wrong: Number(result.totalWrong != null ? result.totalWrong : (result.wrong || 0)),
       unattempted: Number(result.totalUnattempted != null ? result.totalUnattempted : (result.unattempted || 0)),
-      submittedAt: result.submittedAt || Date.now()
+      submittedAt: subAt,
+      perQuestion: Array.isArray(result.perQuestion) ? result.perQuestion.slice() : []
     };
     entry.total = entry.correct + entry.wrong + entry.unattempted;
     entry.percentage = entry.maxScore > 0 ? ((entry.score / entry.maxScore) * 100).toFixed(1) : "0.0";
@@ -88,42 +180,8 @@
     return entry;
   }
 
-  /* Get all mock results combining history log & standalone gate-result-{year} */
   function allMockResults() {
-    var history = loadMockHistory();
-    var historyYears = {};
-    history.forEach(function (h) {
-      if (h.year) historyYears[h.year] = true;
-    });
-
-    var results = history.slice();
-
-    /* Also incorporate any legacy gate-result-{year} that wasn't recorded in history */
-    var manifest = window.GATE_MANIFEST || [];
-    manifest.forEach(function (entry) {
-      if (!historyYears[entry.year]) {
-        var r = safeGet("gate-result-" + entry.year);
-        if (r) {
-          var item = {
-            id: "legacy_" + entry.year,
-            type: "mock",
-            year: entry.year,
-            label: entry.label || ("GATE " + entry.year),
-            score: Number(r.totalScore != null ? r.totalScore : (r.score || 0)),
-            maxScore: Number(r.maxScore || 100),
-            correct: Number(r.totalCorrect != null ? r.totalCorrect : (r.correct || 0)),
-            wrong: Number(r.totalWrong != null ? r.totalWrong : (r.wrong || 0)),
-            unattempted: Number(r.totalUnattempted != null ? r.totalUnattempted : (r.unattempted || 0)),
-            submittedAt: r.submittedAt || null
-          };
-          item.total = item.correct + item.wrong + item.unattempted;
-          item.percentage = item.maxScore > 0 ? ((item.score / item.maxScore) * 100).toFixed(1) : "0.0";
-          results.push(item);
-        }
-      }
-    });
-
-    return results.sort(function(a, b) {
+    return loadMockHistory().slice().sort(function(a, b) {
       return (b.submittedAt || 0) - (a.submittedAt || 0);
     });
   }
@@ -137,10 +195,14 @@
   }
 
   function savePracticeSession(session) {
+    session = session || {};
     var history = loadPracticeHistory();
+    var subAt = session.completedAt || session.submittedAt || Date.now();
     var record = {
-      id: "prac_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
-      submittedAt: session.submittedAt || Date.now(),
+      id: session.id || ("practice-" + Date.now() + "-" + Math.floor(Math.random() * 10000)),
+      type: "practice",
+      submittedAt: subAt,
+      completedAt: subAt,
       topics: session.topics || [],
       topicNames: session.topicNames || [],
       years: session.years || [],
@@ -164,11 +226,144 @@
   }
 
   /* ══════════════════════════════════════════
-     4. AGGREGATE STATS & TOPIC MASTERY
+     4. TOPIC MASTERY & AGGREGATE STATS
   ══════════════════════════════════════════ */
 
+  function computeTopicMastery() {
+    var rawTopics = (window.GATE_TOPICS && window.GATE_TOPICS.list) || [
+      { id: "general-aptitude",     name: "General Aptitude",          icon: "🧠", color: "#7c3aed" },
+      { id: "engineering-math",     name: "Engineering Mathematics",   icon: "📐", color: "#0891b2" },
+      { id: "structural-analysis",  name: "Structural Analysis",       icon: "🏗️", color: "#0369a1" },
+      { id: "solid-mechanics",      name: "Solid Mechanics & Design",  icon: "🔩", color: "#b45309" },
+      { id: "concrete-structures",  name: "Concrete Structures (RCC)", icon: "🧱", color: "#6b7280" },
+      { id: "steel-structures",     name: "Steel Structures",          icon: "⚙️", color: "#374151" },
+      { id: "construction-mgmt",    name: "Construction & Management", icon: "🏛️", color: "#065f46" },
+      { id: "geotechnical",         name: "Geotechnical Engineering",  icon: "🌍", color: "#92400e" },
+      { id: "fluid-mechanics",      name: "Fluid Mechanics",           icon: "💧", color: "#1d4ed8" },
+      { id: "hydraulics",           name: "Hydraulics & Open Channel", icon: "🌊", color: "#0e7490" },
+      { id: "hydrology",            name: "Hydrology",                 icon: "🌧️", color: "#1e40af" },
+      { id: "irrigation",           name: "Irrigation Engineering",    icon: "🚿", color: "#15803d" },
+      { id: "environmental",        name: "Environmental Engineering", icon: "🌿", color: "#166534" },
+      { id: "transportation",       name: "Transportation Engineering", icon: "🛣️", color: "#be185d" },
+      { id: "surveying",            name: "Surveying & Geomatics",     icon: "📏", color: "#7c2d12" }
+    ];
+
+    var list = rawTopics.map(function (t) {
+      return {
+        id: t.id,
+        name: t.name,
+        icon: t.icon,
+        color: t.color,
+        total: 0,
+        correct: 0,
+        wrong: 0,
+        skipped: 0,
+        accuracy: null,
+        status: "untested"
+      };
+    });
+
+    var map = {};
+    list.forEach(function (m) { map[m.id] = m; });
+
+    /* Aggregate Practice Sessions */
+    var practiceHistory = loadPracticeHistory();
+    practiceHistory.forEach(function (s) {
+      if (Array.isArray(s.topics)) {
+        s.topics.forEach(function (top) {
+          if (typeof top === "object" && top !== null) {
+            var tid = top.topic || top.id;
+            var bucket = map[tid];
+            if (bucket) {
+              var c = Number(top.correct || 0);
+              var w = Number(top.wrong || 0);
+              var sk = Number(top.skipped || 0);
+              var tot = (top.total != null) ? Number(top.total) : (c + w);
+              bucket.correct += c;
+              bucket.wrong   += w;
+              bucket.skipped += sk;
+              bucket.total   += tot;
+            }
+          }
+        });
+      }
+      if (s.topicBreakdown && typeof s.topicBreakdown === "object") {
+        Object.keys(s.topicBreakdown).forEach(function (k) {
+          var bucket = map[k];
+          if (!bucket) return;
+          var b = s.topicBreakdown[k];
+          var c = Number(b.correct || 0);
+          var tot = Number(b.total || 0);
+          var w = (b.wrong != null) ? Number(b.wrong) : (tot - c);
+          bucket.correct += c;
+          bucket.wrong   += (w >= 0 ? w : 0);
+          bucket.skipped += Number(b.skipped || 0);
+          bucket.total   += (tot > 0 ? tot : (c + w));
+        });
+      }
+    });
+
+    /* Aggregate Mock Attempts */
+    var mockHistory = loadMockHistory();
+    mockHistory.forEach(function (m) {
+      var perQ = (Array.isArray(m.perQuestion) && m.perQuestion.length > 0) ? m.perQuestion : null;
+      if (!perQ && window.GateStorage && window.GateStorage.loadResult) {
+        var stored = window.GateStorage.loadResult(m.year);
+        if (stored && Array.isArray(stored.perQuestion)) perQ = stored.perQuestion;
+      }
+      if (!perQ) return;
+
+      var paper = (window.GATE_PAPERS && window.GATE_PAPERS[m.year]) || null;
+      var qMap = {};
+      if (paper && Array.isArray(paper.questions)) {
+        paper.questions.forEach(function(q) { qMap[q.id] = q; });
+      }
+
+      perQ.forEach(function (item) {
+        var q = qMap[item.id];
+        if (!q) return;
+        var tid = window.GATE_TOPICS ? window.GATE_TOPICS.classify(q) : "engineering-math";
+        var bucket = map[tid];
+        if (!bucket) return;
+
+        if (item.verdict === "correct") {
+          bucket.correct++;
+          bucket.total++;
+        } else if (item.verdict === "wrong") {
+          bucket.wrong++;
+          bucket.total++;
+        } else if (item.verdict === "unattempted" || item.verdict === "skipped") {
+          bucket.skipped++;
+        }
+      });
+    });
+
+    /* Finalize accuracies and status */
+    list.forEach(function (m) {
+      if (m.total > 0) {
+        m.accuracy = Math.round((m.correct / m.total) * 100);
+        if (m.accuracy >= 75) m.status = "strong";
+        else if (m.accuracy >= 45) m.status = "average";
+        else m.status = "weak";
+      } else {
+        m.accuracy = null;
+        m.status = "untested";
+      }
+      m.attempted = m.total;
+    });
+
+    return list;
+  }
+
+  function getTopicMastery() {
+    var list = computeTopicMastery();
+    var dict = {};
+    list.forEach(function (m) { dict[m.id] = m; });
+    return dict;
+  }
+
   function computeStats() {
-    var mocks = allMockResults();
+    var mocks = loadMockHistory();
     var practice = loadPracticeHistory();
 
     var mockStats = {
@@ -219,7 +414,7 @@
                                     (practiceStats.totalCorrect + practiceStats.totalWrong);
     var overallCorrect = mockStats.totalCorrect + practiceStats.totalCorrect;
     var overallAccuracy = overallQuestionsAttempted > 0 ?
-                          Math.round((overallCorrect / overallQuestionsAttempted) * 100) : 0;
+                          Math.round((overallCorrect / overallQuestionsAttempted) * 100) : null;
 
     return {
       mock: mockStats,
@@ -227,107 +422,124 @@
       overall: {
         questionsAttempted: overallQuestionsAttempted,
         correct: overallCorrect,
+        accuracy: overallAccuracy == null ? 0 : overallAccuracy
+      },
+      combined: {
+        attempted: overallQuestionsAttempted,
+        correct: overallCorrect,
         accuracy: overallAccuracy
       }
     };
   }
 
-  /* Compute per-topic mastery combining practice breakdown */
-  function getTopicMastery() {
-    var practice = loadPracticeHistory();
-    var mastery = {};
-
-    var allTopics = [];
-    if (window.GATE_TOPICS && window.GATE_TOPICS.ALL) {
-      allTopics = window.GATE_TOPICS.ALL;
-    } else {
-      allTopics = [
-        { id: "geotech", name: "Geotechnical Engineering", icon: "⛰️", color: "#8d6e63" },
-        { id: "structural", name: "Structural Engineering", icon: "🏛️", color: "#5c6bc0" },
-        { id: "environmental", name: "Environmental Engineering", icon: "🌱", color: "#26a69a" },
-        { id: "transportation", name: "Transportation Engineering", icon: "🛣️", color: "#ffa726" },
-        { id: "surveying", name: "Surveying & Geomatics", icon: "📐", color: "#ab47bc" },
-        { id: "fluids", name: "Fluid Mechanics & Hydraulics", icon: "💧", color: "#29b6f6" },
-        { id: "hydrology", name: "Hydrology & Water Resources", icon: "🌊", color: "#00acc1" },
-        { id: "rcc", name: "RCC & Prestressed Concrete", icon: "🧱", color: "#78909c" },
-        { id: "steel", name: "Steel Structures", icon: "🏗️", color: "#66bb6a" },
-        { id: "materials", name: "Construction Materials & Mgmt", icon: "📦", color: "#d4e157" },
-        { id: "mechanics", name: "Engineering Mechanics & SOM", icon: "⚙️", color: "#ef5350" },
-        { id: "irrigation", name: "Irrigation Engineering", icon: "🌾", color: "#9ccc65" },
-        { id: "maths", name: "Engineering Mathematics", icon: "🔢", color: "#42a5f5" },
-        { id: "aptitude", name: "General Aptitude", icon: "💡", color: "#ffca28" },
-        { id: "general", name: "General Civil Engineering", icon: "📋", color: "#8e24aa" }
-      ];
-    }
-
-    allTopics.forEach(function (t) {
-      mastery[t.id] = {
-        id: t.id,
-        name: t.name,
-        icon: t.icon,
-        color: t.color,
-        attempted: 0,
-        correct: 0,
-        wrong: 0,
-        accuracy: 0,
-        status: "untested"
-      };
-    });
-
-    practice.forEach(function (session) {
-      if (!session.topicBreakdown) return;
-      Object.keys(session.topicBreakdown).forEach(function (topicKey) {
-        var t = mastery[topicKey];
-        if (!t) return;
-        var b = session.topicBreakdown[topicKey];
-        var total = b.total || 0;
-        var corr = b.correct || 0;
-        t.attempted += total;
-        t.correct   += corr;
-        t.wrong     += (total - corr);
-      });
-    });
-
-    Object.keys(mastery).forEach(function (k) {
-      var t = mastery[k];
-      if (t.attempted > 0) {
-        t.accuracy = Math.round((t.correct / t.attempted) * 100);
-        if (t.accuracy >= 75) t.status = "strong";
-        else if (t.accuracy >= 45) t.status = "average";
-        else t.status = "weak";
-      } else {
-        t.status = "untested";
-      }
-    });
-
-    return mastery;
-  }
-
   /* ══════════════════════════════════════════
-     5. BACKUP & RESET
+     5. BACKUP, RESTORE & RESET
   ══════════════════════════════════════════ */
 
-  function exportAllData() {
-    var data = {
+  function exportData() {
+    return {
       profile: loadProfile(),
       mockHistory: loadMockHistory(),
       practiceHistory: loadPracticeHistory(),
       exportedAt: new Date().toISOString()
     };
-    return JSON.stringify(data, null, 2);
   }
 
-  function resetAllData() {
+  function exportAllData() {
+    return JSON.stringify(exportData(), null, 2);
+  }
+
+  function validateImport(text) {
+    if (typeof text !== "string") return { ok: false, error: "Input must be a string" };
+    var data;
+    try {
+      data = JSON.parse(text);
+    } catch(e) {
+      return { ok: false, error: "Invalid JSON format" };
+    }
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      return { ok: false, error: "Expected a JSON object" };
+    }
+    if (data.profile != null && (typeof data.profile !== "object" || Array.isArray(data.profile))) {
+      return { ok: false, error: "Corrupted profile data in backup" };
+    }
+    if (data.mockHistory != null && !Array.isArray(data.mockHistory)) {
+      return { ok: false, error: "Corrupted mock history data in backup" };
+    }
+    if (data.practiceHistory != null && !Array.isArray(data.practiceHistory)) {
+      return { ok: false, error: "Corrupted practice history data in backup" };
+    }
+    if (!data.profile && !data.mockHistory && !data.practiceHistory) {
+      return { ok: false, error: "Backup file contains no identifiable GATE profile or history" };
+    }
+    return { ok: true, data: data };
+  }
+
+  function importData(dataOrText) {
+    var check = typeof dataOrText === "string" ? validateImport(dataOrText) : { ok: true, data: dataOrText };
+    if (!check.ok) return check;
+    var d = check.data;
+
+    if (d.profile && typeof d.profile === "object") {
+      saveProfile(d.profile);
+    }
+
+    if (Array.isArray(d.mockHistory)) {
+      safeSet(MOCK_HIST_KEY, d.mockHistory);
+      d.mockHistory.forEach(function (m) {
+        if (m.year && window.GateStorage && window.GateStorage.saveResult) {
+          window.GateStorage.saveResult(m.year, {
+            year: m.year,
+            totalScore: m.score,
+            maxScore: m.maxScore || 100,
+            totalCorrect: m.correct,
+            totalWrong: m.wrong,
+            totalUnattempted: m.unattempted,
+            perQuestion: m.perQuestion || [],
+            submittedAt: m.submittedAt
+          });
+        }
+      });
+    }
+
+    if (Array.isArray(d.practiceHistory)) {
+      safeSet(PRAC_HIST_KEY, d.practiceHistory);
+    }
+
+    return {
+      ok: true,
+      counts: {
+        mocks: (d.mockHistory || []).length,
+        practice: (d.practiceHistory || []).length
+      }
+    };
+  }
+
+  function resetAll() {
     localStorage.removeItem(PROFILE_KEY);
     localStorage.removeItem(MOCK_HIST_KEY);
     localStorage.removeItem(PRAC_HIST_KEY);
 
-    /* Also clear attempt states and results */
     var manifest = window.GATE_MANIFEST || [];
     manifest.forEach(function (entry) {
+      if (window.GateStorage && window.GateStorage.clearResult) {
+        window.GateStorage.clearResult(entry.year);
+      }
       localStorage.removeItem("gate-result-" + entry.year);
       localStorage.removeItem("gate-attempt-" + entry.year);
+      localStorage.removeItem("gate_attempt_" + entry.year);
     });
+
+    try {
+      if (typeof localStorage !== "undefined" && localStorage.length) {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+          var key = localStorage.key(i);
+          if (key && (key.indexOf("gate-result-") === 0 || key.indexOf("gate_attempt_") === 0 || key.indexOf("gate-attempt-") === 0)) {
+            localStorage.removeItem(key);
+          }
+        }
+      }
+    } catch(e) {}
   }
 
   /* ── Expose Globally ── */
@@ -342,10 +554,15 @@
     loadPracticeHistory: loadPracticeHistory,
     savePracticeSession: savePracticeSession,
     clearPracticeHistory: clearPracticeHistory,
-    computeStats: computeStats,
+    computeTopicMastery: computeTopicMastery,
     getTopicMastery: getTopicMastery,
+    computeStats: computeStats,
+    exportData: exportData,
     exportAllData: exportAllData,
-    resetAllData: resetAllData
+    validateImport: validateImport,
+    importData: importData,
+    resetAll: resetAll,
+    resetAllData: resetAll
   };
 
 })();

@@ -193,7 +193,8 @@
     showOnboarding: showOnboarding,
     renderNavAvatar: renderNavAvatar,
     initials: initials,
-    avatarGradient: avatarGradient
+    avatarGradient: avatarGradient,
+    avatarColor: avatarGradient
   };
 
 })();

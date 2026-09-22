@@ -1,330 +1,416 @@
 /* ============================================================
-   GATE CE — Profile & Progress page
+   GATE CE — Profile & Progress Dashboard Controller (profile-page.js)
    ============================================================ */
 (function () {
 
+  var currentTopicFilter = "all";
+
   document.addEventListener("DOMContentLoaded", function () {
-    renderIdentity();
-    renderKPIs();
-    renderMastery();
-    renderMockHistory();
-    renderPracticeHistory();
-    wireTabs();
-    wireNameEditing();
-    wireDataActions();
+    initProfilePage();
   });
 
-  /* ───────────────────────────── Identity ───────────────────────────── */
-
-  function renderIdentity() {
-    var profile = window.GateProfile.load() || {};
-    var name = (profile.name || "").trim() || "GATE Aspirant";
-
-    document.getElementById("profile-name").textContent = name;
-    document.getElementById("name-input").value = profile.name || "";
-
-    var avatar = document.getElementById("avatar-lg");
-    avatar.textContent = window.GateOnboarding.initials(name);
-    avatar.style.background = window.GateOnboarding.avatarColor(name);
-
-    var stats = window.GateProfile.computeStats();
-    var since = profile.createdAt
-      ? " Preparing since " + formatDate(profile.createdAt) + "."
-      : "";
-    document.getElementById("profile-sub").textContent =
-      stats.mock.count + " mock test" + (stats.mock.count === 1 ? "" : "s") +
-      " and " + stats.practice.sessions + " practice session" +
-      (stats.practice.sessions === 1 ? "" : "s") + " recorded." + since;
+  function initProfilePage() {
+    renderProfileHeader();
+    renderKPIs();
+    renderTopicMastery();
+    renderMockHistory();
+    renderPracticeHistory();
+    wireEventListeners();
   }
 
-  function wireNameEditing() {
-    var row = document.querySelector(".profile-name-row");
-    var editBox = document.getElementById("profile-name-edit");
-    var input = document.getElementById("name-input");
+  /* ─────────────────────────────────────────────────────────────
+     1. Profile Header
+     ───────────────────────────────────────────────────────────── */
+  function renderProfileHeader() {
+    if (!window.GateProfile) return;
+    var profile = window.GateProfile.load();
+    var name = (profile && profile.name) ? profile.name.trim() : "GATE Aspirant";
 
-    document.getElementById("edit-name-btn").addEventListener("click", function () {
-      row.classList.add("hidden");
-      editBox.classList.remove("hidden");
-      input.focus();
-      input.select();
-    });
+    var nameEl = document.getElementById("hero-user-name");
+    if (nameEl) nameEl.textContent = name;
 
-    document.getElementById("cancel-name-btn").addEventListener("click", close);
+    var avatarEl = document.getElementById("hero-avatar");
+    if (avatarEl && window.GateOnboarding) {
+      avatarEl.textContent = window.GateOnboarding.initials(name);
+      avatarEl.style.background = window.GateOnboarding.avatarGradient(name);
+    }
 
-    document.getElementById("save-name-btn").addEventListener("click", function () {
-      var name = input.value.trim();
-      if (name.length < 2) { input.focus(); return; }
-      window.GateProfile.save({ name: name });
-      close();
-      renderIdentity();
-      window.GateOnboarding.renderNavAvatar();
-    });
+    var joinedEl = document.getElementById("badge-joined");
+    if (joinedEl && profile && profile.createdAt) {
+      var d = new Date(profile.createdAt);
+      var monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      joinedEl.textContent = "Prep Started " + monthNames[d.getMonth()] + " " + d.getFullYear();
+    }
 
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") document.getElementById("save-name-btn").click();
-      if (e.key === "Escape") close();
-    });
-
-    function close() {
-      editBox.classList.add("hidden");
-      row.classList.remove("hidden");
+    /* Aspirant Level badge based on activity */
+    var stats = window.GateProfile.computeStats();
+    var levelEl = document.getElementById("badge-level");
+    if (levelEl) {
+      var totalQ = (stats.overall ? stats.overall.questionsAttempted : 0);
+      if (totalQ >= 200) {
+        levelEl.textContent = "🏆 Exam Ready Aspirant";
+        levelEl.style.color = "#ffca28";
+        levelEl.style.borderColor = "rgba(255,202,40,0.4)";
+      } else if (totalQ >= 50) {
+        levelEl.textContent = "🔥 Consistent Solver";
+      } else {
+        levelEl.textContent = "⚡ Active Aspirant";
+      }
     }
   }
 
-  /* ───────────────────────────── KPIs ───────────────────────────── */
-
+  /* ─────────────────────────────────────────────────────────────
+     2. KPIs
+     ───────────────────────────────────────────────────────────── */
   function renderKPIs() {
+    if (!window.GateProfile) return;
     var stats = window.GateProfile.computeStats();
-    var c = stats.combined;
 
-    setText("kpi-accuracy", c.accuracy == null ? "—" : c.accuracy + "%");
-    setText("kpi-accuracy-foot", c.attempted
-      ? c.correct + " of " + c.attempted + " answered correctly"
-      : "No questions attempted yet");
+    /* Overall Accuracy */
+    var accEl = document.getElementById("kpi-overall-acc");
+    var countsEl = document.getElementById("kpi-overall-counts");
+    var barEl = document.getElementById("kpi-overall-bar");
 
-    setText("kpi-mocks", stats.mock.count);
-    setText("kpi-mocks-foot", stats.mock.count
-      ? stats.mock.totalCorrect + " correct · " + stats.mock.totalWrong + " wrong"
-      : "No mock tests yet");
+    var overallAcc = stats.overall.accuracy || 0;
+    accEl.textContent = overallAcc + "%";
+    countsEl.textContent = stats.overall.correct + " / " + stats.overall.questionsAttempted + " correct answers";
+    barEl.style.width = overallAcc + "%";
 
-    setText("kpi-practice", stats.practice.totalQuestions);
-    setText("kpi-practice-foot", stats.practice.sessions
-      ? "across " + stats.practice.sessions + " session" + (stats.practice.sessions === 1 ? "" : "s")
-      : "No practice yet");
+    /* Mock stats */
+    var mockCountEl = document.getElementById("kpi-mock-count");
+    var mockSubEl = document.getElementById("kpi-mock-sub");
+    var mockTagEl = document.getElementById("kpi-mock-tag");
 
-    setText("kpi-best", stats.mock.bestScore == null ? "—" : round1(stats.mock.bestScore) + " / 100");
-    setText("kpi-best-foot", stats.mock.bestScore == null ? "Attempt a mock to set a baseline" : "Highest mock score");
+    mockCountEl.textContent = stats.mock.count;
+    if (stats.mock.count > 0) {
+      var avg = stats.mock.avgScore != null ? (Math.round(stats.mock.avgScore * 10) / 10) : 0;
+      var best = stats.mock.bestScore != null ? (Math.round(stats.mock.bestScore * 10) / 10) : 0;
+      mockSubEl.textContent = "Avg: " + avg + "/100 · Best: " + best + "/100";
+      mockTagEl.textContent = stats.mock.count + " paper" + (stats.mock.count === 1 ? "" : "s") + " submitted";
+    } else {
+      mockSubEl.textContent = "No mock tests submitted yet";
+      mockTagEl.textContent = "Ready to start full tests";
+    }
 
-    setText("kpi-avg", stats.mock.avgScore == null ? "—" : round1(stats.mock.avgScore) + " / 100");
-    setText("kpi-avg-foot", stats.mock.avgScore == null ? "Attempt a mock to set a baseline" : "Across all attempts");
+    /* Practice stats */
+    var pracQEl = document.getElementById("kpi-practice-q");
+    var pracAccEl = document.getElementById("kpi-practice-acc");
+    var pracTagEl = document.getElementById("kpi-practice-tag");
+
+    pracQEl.textContent = stats.practice.totalQuestions;
+    pracAccEl.textContent = "Accuracy: " + stats.practice.accuracy + "%";
+    pracTagEl.textContent = stats.practice.sessions + " session" + (stats.practice.sessions === 1 ? "" : "s") + " completed";
+
+    /* Topics covered */
+    var mastery = window.GateProfile.getTopicMastery();
+    var topicKeys = Object.keys(mastery);
+    var activeTopics = topicKeys.filter(function(k) { return mastery[k].attempted > 0; }).length;
+
+    var topActiveEl = document.getElementById("kpi-topics-active");
+    var topSubEl = document.getElementById("kpi-topics-sub");
+    topActiveEl.textContent = activeTopics + " / " + topicKeys.length;
+    topSubEl.textContent = activeTopics === 0 ? "Civil Engineering Syllabus" : (activeTopics + " topics practiced");
   }
 
-  /* ───────────────────────────── Topic mastery ───────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     3. Topic Mastery Matrix
+     ───────────────────────────────────────────────────────────── */
+  function renderTopicMastery() {
+    if (!window.GateProfile) return;
+    var mastery = window.GateProfile.getTopicMastery();
+    var grid = document.getElementById("topic-mastery-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
 
-  function renderMastery() {
-    var list = window.GateProfile.computeTopicMastery();
-    var wrap = document.getElementById("mastery-list");
-    wrap.innerHTML = "";
+    var keys = Object.keys(mastery);
 
-    list.forEach(function (t) {
-      var pct = t.accuracy;
-      var row = document.createElement("div");
-      row.className = "mastery-row" + (pct == null ? " mastery-row--empty" : "");
-
-      var meta = window.GATE_TOPICS.get(t.id);
-      var color = pct == null ? "var(--surface3)" : accuracyColor(pct, meta.color);
-
-      row.innerHTML =
-        '<span class="mastery-icon">' + meta.icon + "</span>" +
-        '<span class="mastery-name">' + escapeHtml(meta.name) + "</span>" +
-        '<div class="mastery-track"><div class="mastery-fill" style="width:' +
-          (pct == null ? 0 : pct) + "%;background:" + color + '"></div></div>' +
-        '<span class="mastery-pct">' + (pct == null ? "—" : pct + "%") + "</span>" +
-        '<span class="mastery-count">' + (t.total ? t.correct + "/" + t.total : "not attempted") + "</span>" +
-        '<a class="mastery-practice" href="practice.html?topic=' +
-          encodeURIComponent(t.id) + '">Practice</a>';
-
-      wrap.appendChild(row);
+    /* Filter if applicable */
+    var filtered = keys.filter(function (k) {
+      if (currentTopicFilter === "all") return true;
+      return mastery[k].status === currentTopicFilter;
     });
-  }
 
-  /* ───────────────────────────── Mock tests ───────────────────────────── */
-
-  function renderMockHistory() {
-    var history = window.GateProfile.loadMockHistory();
-    var wrap = document.getElementById("mock-list");
-    wrap.innerHTML = "";
-
-    if (!history.length) {
-      wrap.innerHTML =
-        '<p class="empty-note">No mock tests recorded yet. ' +
-        '<a href="index.html">Pick a paper to begin</a>.</p>';
+    if (filtered.length === 0) {
+      grid.innerHTML =
+        '<div class="empty-state" style="grid-column: 1 / -1;">' +
+        '<div class="empty-state-icon">🔍</div>' +
+        '<p class="empty-state-title">No topics match this filter</p>' +
+        '<p class="empty-state-sub">Try selecting a different filter above or practice more questions.</p>' +
+        '</div>';
       return;
     }
 
-    history.forEach(function (m) {
-      var attempted = m.correct + m.wrong;
-      var acc = attempted ? Math.round(m.correct / attempted * 100) : null;
+    filtered.forEach(function (k) {
+      var t = mastery[k];
+      var card = document.createElement("div");
+      card.className = "mastery-card";
 
-      var item = document.createElement("div");
-      item.className = "history-item";
-      item.innerHTML =
-        '<div class="hi-main">' +
-          '<div class="hi-title">' + escapeHtml(m.label || m.year) + "</div>" +
-          '<div class="hi-meta">' + formatDateTime(m.submittedAt) +
-            (acc == null ? "" : " · " + acc + "% accuracy") + "</div>" +
-        "</div>" +
-        '<div class="hi-score">' + round1(m.score) + '<span> / ' + (m.maxScore || 100) + "</span></div>" +
-        '<div class="hi-pills">' +
-          '<span class="pill pill--correct">' + m.correct + " correct</span>" +
-          '<span class="pill pill--wrong">' + m.wrong + " wrong</span>" +
-          '<span class="pill pill--skip">' + m.unattempted + " skipped</span>" +
-        "</div>" +
-        '<div class="hi-actions">' +
-          '<a class="review-btn" href="result.html?year=' + encodeURIComponent(m.year) + '">Review</a>' +
-        "</div>";
-      wrap.appendChild(item);
+      var badgeClass = "mastery-badge--" + t.status;
+      var badgeText = t.status === "strong" ? "Strong (≥75%)" :
+                      t.status === "average" ? "Moderate (45-74%)" :
+                      t.status === "weak" ? "Needs Practice (<45%)" : "Untested";
+
+      var barColor = t.status === "strong" ? "#4caf50" :
+                     t.status === "average" ? "#ffb300" :
+                     t.status === "weak" ? "#ef5350" : "#3a4060";
+
+      card.innerHTML =
+        '<div class="mastery-card-top">' +
+          '<div class="mastery-topic-title-wrap">' +
+            '<span class="mastery-topic-icon">' + (t.icon || "📚") + '</span>' +
+            '<div class="mastery-topic-name">' + t.name + '</div>' +
+          '</div>' +
+          '<span class="mastery-badge ' + badgeClass + '">' + badgeText + '</span>' +
+        '</div>' +
+        '<div class="mastery-stats-row">' +
+          '<span class="mastery-acc-text">' + (t.attempted > 0 ? (t.accuracy + "% Accuracy") : "No attempts") + '</span>' +
+          '<span class="mastery-q-count">' + (t.attempted > 0 ? (t.correct + "/" + t.attempted + " correct") : "0 Qs") + '</span>' +
+        '</div>' +
+        '<div class="mastery-bar-wrap">' +
+          '<div class="mastery-bar-fill" style="width:' + (t.attempted > 0 ? t.accuracy : 0) + '%; background:' + barColor + ';"></div>' +
+        '</div>' +
+        '<div class="mastery-card-actions">' +
+          '<a href="practice.html?topic=' + encodeURIComponent(t.id) + '" class="mastery-practice-btn">' +
+            '⚡ Practice Topic →' +
+          '</a>' +
+        '</div>';
+
+      grid.appendChild(card);
     });
   }
 
-  /* ───────────────────────────── Practice ───────────────────────────── */
+  /* ─────────────────────────────────────────────────────────────
+     4. History Tabs (Mock & Practice)
+     ───────────────────────────────────────────────────────────── */
+  function renderMockHistory() {
+    if (!window.GateProfile) return;
+    var list = document.getElementById("mock-history-list");
+    var countBadge = document.getElementById("mock-history-count");
+    if (!list) return;
+
+    var mocks = window.GateProfile.allMockResults();
+    if (countBadge) countBadge.textContent = mocks.length;
+
+    if (mocks.length === 0) {
+      list.innerHTML =
+        '<div class="empty-state">' +
+          '<div class="empty-state-icon">📝</div>' +
+          '<h3 class="empty-state-title">No Mock Tests Taken Yet</h3>' +
+          '<p class="empty-state-sub">Complete full-length GATE previous year papers (2015–2025) with exact examination timing and scoring.</p>' +
+          '<a href="index.html" class="cta-btn cta-btn--primary" style="margin-top:8px;">Attempt a Mock Test →</a>' +
+        '</div>';
+      return;
+    }
+
+    list.innerHTML = "";
+    mocks.forEach(function (m) {
+      var card = document.createElement("div");
+      card.className = "hist-card";
+
+      var dateStr = m.submittedAt ? formatDate(m.submittedAt) : "Completed Paper";
+      var scoreVal = Math.round(Number(m.score || 0) * 10) / 10;
+      var maxVal = m.maxScore || 100;
+
+      card.innerHTML =
+        '<div class="hist-card-left">' +
+          '<div class="hist-card-title">' + (m.label || ("GATE " + m.year + " Mock Test")) + '</div>' +
+          '<div class="hist-card-meta">' +
+            '<span>🗓️ ' + dateStr + '</span>' +
+            '<span>⏱️ Full Paper</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="hist-card-stats">' +
+          '<div class="hist-breakdown">' +
+            '<span class="hist-tag hist-tag--correct">✓ ' + (m.correct || 0) + '</span>' +
+            '<span class="hist-tag hist-tag--wrong">✗ ' + (m.wrong || 0) + '</span>' +
+            '<span class="hist-tag hist-tag--skip">○ ' + (m.unattempted || 0) + '</span>' +
+          '</div>' +
+          '<div class="hist-score-badge">' +
+            '<span>' + scoreVal + ' / ' + maxVal + '</span>' +
+            '<span class="hist-score-sub">' + (m.percentage || "0.0") + '% Marks</span>' +
+          '</div>' +
+          '<a href="result.html?year=' + encodeURIComponent(m.year) + '" class="hist-review-btn">View Analysis →</a>' +
+        '</div>';
+
+      list.appendChild(card);
+    });
+  }
 
   function renderPracticeHistory() {
-    var history = window.GateProfile.loadPracticeHistory();
-    var wrap = document.getElementById("practice-list");
-    wrap.innerHTML = "";
+    if (!window.GateProfile) return;
+    var list = document.getElementById("practice-history-list");
+    var countBadge = document.getElementById("practice-history-count");
+    if (!list) return;
 
-    if (!history.length) {
-      wrap.innerHTML =
-        '<p class="empty-note">No practice sessions yet. ' +
-        '<a href="practice.html">Start topic-wise practice</a>.</p>';
+    var sessions = window.GateProfile.loadPracticeHistory();
+    if (countBadge) countBadge.textContent = sessions.length;
+
+    if (sessions.length === 0) {
+      list.innerHTML =
+        '<div class="empty-state">' +
+          '<div class="empty-state-icon">⚡</div>' +
+          '<h3 class="empty-state-title">No Practice Sets Recorded Yet</h3>' +
+          '<p class="empty-state-sub">Select topics like Geotechnical, Structural, or Fluids to start topic-wise practice sets.</p>' +
+          '<a href="practice.html" class="cta-btn cta-btn--secondary" style="margin-top:8px;">Start Topic Practice →</a>' +
+        '</div>';
       return;
     }
 
-    history.forEach(function (s) {
-      var attempted = (s.correct || 0) + (s.wrong || 0);
-      var acc = attempted ? Math.round(s.correct / attempted * 100) : null;
+    list.innerHTML = "";
+    sessions.forEach(function (s) {
+      var card = document.createElement("div");
+      card.className = "hist-card";
 
-      var topicNames = (s.topics || []).map(function (t) {
-        return window.GATE_TOPICS.get(t.topic).name;
-      });
-      var shown = topicNames.slice(0, 3);
-      var more = topicNames.length - shown.length;
+      var dateStr = s.submittedAt ? formatDate(s.submittedAt) : "Practice Session";
+      var topicsSummary = (s.topicNames && s.topicNames.length) ?
+                          s.topicNames.slice(0, 3).join(", ") + (s.topicNames.length > 3 ? (" +" + (s.topicNames.length - 3) + " more") : "") :
+                          "Mixed Topics";
 
-      var item = document.createElement("div");
-      item.className = "history-item";
-      item.innerHTML =
-        '<div class="hi-main">' +
-          '<div class="hi-title">' + (s.total || 0) + " question practice set</div>" +
-          '<div class="hi-meta">' + formatDateTime(s.completedAt || s.id) +
-            (acc == null ? "" : " · " + acc + "% accuracy") +
-            (shown.length ? " · " + escapeHtml(shown.join(", ")) + (more > 0 ? " +" + more + " more" : "") : "") +
-          "</div>" +
-        "</div>" +
-        '<div class="hi-pills">' +
-          '<span class="pill pill--correct">' + (s.correct || 0) + " correct</span>" +
-          '<span class="pill pill--wrong">' + (s.wrong || 0) + " wrong</span>" +
-          '<span class="pill pill--skip">' + (s.skipped || 0) + " skipped</span>" +
-        "</div>";
-      wrap.appendChild(item);
+      card.innerHTML =
+        '<div class="hist-card-left">' +
+          '<div class="hist-card-title">' + topicsSummary + '</div>' +
+          '<div class="hist-card-meta">' +
+            '<span>🗓️ ' + dateStr + '</span>' +
+            '<span>⚡ ' + (s.total || 0) + ' Questions</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="hist-card-stats">' +
+          '<div class="hist-breakdown">' +
+            '<span class="hist-tag hist-tag--correct">✓ ' + (s.correct || 0) + '</span>' +
+            '<span class="hist-tag hist-tag--wrong">✗ ' + (s.wrong || 0) + '</span>' +
+            '<span class="hist-tag hist-tag--skip">○ ' + (s.skipped || 0) + '</span>' +
+          '</div>' +
+          '<div class="hist-score-badge">' +
+            '<span>' + (s.percentage || 0) + '%</span>' +
+            '<span class="hist-score-sub">' + (Math.round(Number(s.score || 0) * 10) / 10) + ' Marks</span>' +
+          '</div>' +
+        '</div>';
+
+      list.appendChild(card);
     });
   }
 
-  /* ───────────────────────────── Tabs ───────────────────────────── */
-
-  function wireTabs() {
-    var btns = document.querySelectorAll(".tab-btn");
-    Array.prototype.forEach.call(btns, function (btn) {
-      btn.addEventListener("click", function () {
-        Array.prototype.forEach.call(btns, function (b) { b.classList.remove("active"); });
-        btn.classList.add("active");
-        document.getElementById("tab-mock").classList.toggle("hidden", btn.dataset.tab !== "mock");
-        document.getElementById("tab-practice").classList.toggle("hidden", btn.dataset.tab !== "practice");
-      });
-    });
-  }
-
-  /* ───────────────────────────── Data management ───────────────────────────── */
-
-  function wireDataActions() {
-    document.getElementById("export-btn").addEventListener("click", function () {
-      var data = window.GateProfile.exportData();
-      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      var url = URL.createObjectURL(blob);
-      var profile = window.GateProfile.load() || {};
-      var slug = (profile.name || "gatece").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = slug + "-progress.json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    });
-
-    document.getElementById("import-btn").addEventListener("click", function () {
-      document.getElementById("import-file").click();
-    });
-
-    document.getElementById("import-file").addEventListener("change", function (e) {
-      var file = e.target.files && e.target.files[0];
-      e.target.value = ""; // allow re-picking the same file
-      if (!file) return;
-
-      var reader = new FileReader();
-      reader.onerror = function () { window.alert("Could not read that file."); };
-      reader.onload = function () {
-        var check = window.GateProfile.validateImport(String(reader.result));
-        if (!check.ok) { window.alert("Import failed: " + check.error); return; }
-
-        var current = window.GateProfile.computeStats();
-        var hasData = current.mock.count || current.practice.sessions;
-        if (hasData) {
-          var ok = window.confirm(
-            "Import this backup?\n\nThis REPLACES your current progress in this browser." +
-            "\nCurrent: " + current.mock.count + " mock tests, " +
-            current.practice.sessions + " practice sessions."
-          );
-          if (!ok) return;
-        }
-
-        var res = window.GateProfile.importData(check.data);
-        if (!res.ok) { window.alert("Import failed: " + res.error); return; }
-        window.alert(
-          "Import complete.\n\n" + res.counts.mocks + " mock tests and " +
-          res.counts.practice + " practice sessions restored."
-        );
-        window.location.reload();
-      };
-      reader.readAsText(file);
-    });
-
-    document.getElementById("reset-btn").addEventListener("click", function () {
-      var ok = window.confirm(
-        "Reset all progress?\n\nThis permanently deletes your name, mock test history and practice sessions from this browser."
-      );
-      if (!ok) return;
-      window.GateProfile.resetAll();
-      window.location.href = "index.html";
-    });
-  }
-
-  /* ───────────────────────────── Helpers ───────────────────────────── */
-
-  function setText(id, value) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = value;
-  }
-
-  function round1(n) {
-    return Math.round((Number(n) || 0) * 10) / 10;
-  }
-
-  function accuracyColor(pct, fallback) {
-    if (pct >= 70) return "var(--green)";
-    if (pct >= 45) return "var(--amber)";
-    if (pct > 0)   return "var(--red)";
-    return fallback;
-  }
-
+  /* ─────────────────────────────────────────────────────────────
+     5. Date Formatting Helper
+     ───────────────────────────────────────────────────────────── */
   function formatDate(ts) {
-    if (!ts) return "—";
-    var d = new Date(ts);
-    return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+    try {
+      var d = new Date(ts);
+      var monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      var hours = d.getHours();
+      var minutes = d.getMinutes();
+      var ampm = hours >= 12 ? "pm" : "am";
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      var minStr = minutes < 10 ? "0" + minutes : minutes;
+      return monthNames[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear() + " · " + hours + ":" + minStr + ampm;
+    } catch(e) {
+      return "Recent";
+    }
   }
 
-  function formatDateTime(ts) {
-    if (!ts) return "Date unknown";
-    var d = new Date(ts);
-    return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) +
-      " · " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
-  }
+  /* ─────────────────────────────────────────────────────────────
+     6. Event Listeners
+     ───────────────────────────────────────────────────────────── */
+  function wireEventListeners() {
+    /* Filter pills */
+    var filterContainer = document.getElementById("topic-filter-pills");
+    if (filterContainer) {
+      filterContainer.addEventListener("click", function (e) {
+        var btn = e.target.closest(".filter-pill");
+        if (!btn) return;
+        filterContainer.querySelectorAll(".filter-pill").forEach(function(b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        currentTopicFilter = btn.dataset.filter || "all";
+        renderTopicMastery();
+      });
+    }
 
-  function escapeHtml(s) {
-    if (window.GateUtils && window.GateUtils.escapeHtml) return window.GateUtils.escapeHtml(String(s == null ? "" : s));
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
-    });
+    /* History tabs */
+    var tabMock = document.getElementById("tab-btn-mock");
+    var tabPrac = document.getElementById("tab-btn-practice");
+    var panelMock = document.getElementById("mock-history-panel");
+    var panelPrac = document.getElementById("practice-history-panel");
+
+    if (tabMock && tabPrac && panelMock && panelPrac) {
+      tabMock.addEventListener("click", function () {
+        tabMock.classList.add("active");
+        tabPrac.classList.remove("active");
+        panelMock.classList.remove("hidden");
+        panelPrac.classList.add("hidden");
+      });
+      tabPrac.addEventListener("click", function () {
+        tabPrac.classList.add("active");
+        tabMock.classList.remove("active");
+        panelPrac.classList.remove("hidden");
+        panelMock.classList.add("hidden");
+      });
+    }
+
+    /* Edit Name Modal */
+    var editBtn = document.getElementById("edit-name-btn");
+    var modal = document.getElementById("edit-name-modal");
+    var cancelBtn = document.getElementById("cancel-edit-btn");
+    var saveBtn = document.getElementById("save-name-btn");
+    var input = document.getElementById("edit-name-input");
+
+    if (editBtn && modal && cancelBtn && saveBtn && input) {
+      editBtn.addEventListener("click", function () {
+        var profile = window.GateProfile.load();
+        input.value = (profile && profile.name) ? profile.name : "";
+        modal.classList.remove("hidden");
+        setTimeout(function() { input.focus(); }, 100);
+      });
+
+      cancelBtn.addEventListener("click", function () {
+        modal.classList.add("hidden");
+      });
+
+      saveBtn.addEventListener("click", function () {
+        var val = input.value.trim();
+        if (val.length < 2) return;
+        window.GateProfile.save({ name: val });
+        modal.classList.add("hidden");
+        renderProfileHeader();
+        if (window.GateOnboarding) window.GateOnboarding.renderNavAvatar();
+      });
+
+      input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") saveBtn.click();
+        if (e.key === "Escape") modal.classList.add("hidden");
+      });
+    }
+
+    /* Export JSON */
+    var exportBtn = document.getElementById("export-data-btn");
+    if (exportBtn) {
+      exportBtn.addEventListener("click", function () {
+        var dataStr = window.GateProfile.exportAllData();
+        var blob = new Blob([dataStr], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "gate-ce-progress-backup-" + new Date().toISOString().slice(0,10) + ".json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    /* Reset Progress */
+    var resetBtn = document.getElementById("reset-data-btn");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", function () {
+        var confirmed = window.confirm("⚠️ Are you sure you want to reset all your test results, practice records, and progress? This cannot be undone.");
+        if (confirmed) {
+          window.GateProfile.resetAllData();
+          initProfilePage();
+          if (window.GateOnboarding) window.GateOnboarding.renderNavAvatar();
+          alert("All progress data has been reset.");
+        }
+      });
+    }
   }
 
 })();

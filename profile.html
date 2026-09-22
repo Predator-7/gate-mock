@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile &amp; Progress — GATE CE</title>
-<meta name="description" content="Your GATE Civil Engineering preparation dashboard — mock test history, practice sessions and topic-wise mastery.">
+<title>My Profile & Progress — GATE CE Prep</title>
+<meta name="description" content="View your GATE Civil Engineering mock test results, topic-wise practice accuracy, strengths and weaknesses.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
 </head>
 <body>
 
+<!-- ── Nav Header ── -->
 <header class="site-header">
   <div class="site-header-inner">
     <a href="index.html" class="site-logo">
@@ -20,145 +21,169 @@
       <h1>GATE CE</h1>
     </a>
     <nav class="site-nav">
-      <a href="index.html"    class="site-nav-link">Mock Tests</a>
+      <a href="index.html" class="site-nav-link">Mock Tests</a>
       <a href="practice.html" class="site-nav-link site-nav-link--practice">⚡ Practice</a>
-      <a href="profile.html"  class="site-nav-link active">Progress</a>
+      <a href="profile.html" class="site-nav-link active">Progress</a>
     </nav>
   </div>
 </header>
 
 <main class="profile-main">
 
-  <!-- ── Identity ── -->
-  <section class="profile-hero">
-    <div class="avatar-lg" id="avatar-lg">?</div>
-    <div class="profile-identity">
-      <div class="profile-name-row">
-        <h2 class="profile-name" id="profile-name">Your Name</h2>
-        <button type="button" class="ghost-btn" id="edit-name-btn">Edit</button>
+  <!-- ── User Profile Hero ── -->
+  <section class="profile-hero-card">
+    <div class="profile-hero-left">
+      <div class="profile-avatar-wrap">
+        <div id="hero-avatar" class="profile-avatar-large">G</div>
       </div>
-      <div class="profile-name-edit hidden" id="profile-name-edit">
-        <input id="name-input" class="name-input" type="text" maxlength="40" placeholder="Your name" autocomplete="name">
-        <button type="button" class="primary-btn" id="save-name-btn">Save</button>
-        <button type="button" class="secondary-btn" id="cancel-name-btn">Cancel</button>
+      <div class="profile-user-info">
+        <div class="profile-name-row">
+          <h1 id="hero-user-name" class="profile-user-name">GATE Aspirant</h1>
+          <button type="button" id="edit-name-btn" class="edit-btn" title="Edit Name">✏️ Edit</button>
+        </div>
+        <p class="profile-user-tag">GATE Civil Engineering Aspirant</p>
+        <div class="profile-badges-row">
+          <span class="badge-pill" id="badge-level">⚡ Active Aspirant</span>
+          <span class="badge-pill badge-pill--muted" id="badge-joined">Joined Recently</span>
+        </div>
       </div>
-      <p class="profile-sub" id="profile-sub">Your progress is stored locally in this browser.</p>
     </div>
-    <div class="profile-actions">
-      <a href="index.html" class="secondary-btn">Take a Mock Test</a>
-      <a href="practice.html" class="secondary-btn">Practice Topics</a>
-    </div>
-  </section>
-
-  <!-- ── KPI cards ── -->
-  <section class="kpi-grid" id="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-value" id="kpi-accuracy">—</div>
-      <div class="kpi-label">Combined Accuracy</div>
-      <div class="kpi-foot" id="kpi-accuracy-foot">&nbsp;</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value" id="kpi-mocks">0</div>
-      <div class="kpi-label">Mock Tests</div>
-      <div class="kpi-foot" id="kpi-mocks-foot">&nbsp;</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value" id="kpi-practice">0</div>
-      <div class="kpi-label">Practice Questions</div>
-      <div class="kpi-foot" id="kpi-practice-foot">&nbsp;</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value" id="kpi-best">—</div>
-      <div class="kpi-label">Best Score</div>
-      <div class="kpi-foot" id="kpi-best-foot">&nbsp;</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-value" id="kpi-avg">—</div>
-      <div class="kpi-label">Average Score</div>
-      <div class="kpi-foot" id="kpi-avg-foot">&nbsp;</div>
+    <div class="profile-hero-actions">
+      <a href="practice.html" class="cta-btn cta-btn--secondary">⚡ Topic Practice</a>
+      <a href="index.html" class="cta-btn cta-btn--primary">📝 Full Mock Test</a>
     </div>
   </section>
 
-  <!-- ── Topic mastery ── -->
-  <section class="panel">
-    <div class="panel-header">
-      <h3 class="panel-title">Civil Engineering Topic Mastery</h3>
-      <span class="panel-hint">Accuracy across mocks &amp; practice</span>
-    </div>
-    <div class="mastery-list" id="mastery-list"></div>
-  </section>
-
-  <!-- ── History ── -->
-  <section class="panel">
-    <div class="panel-header">
-      <h3 class="panel-title">History</h3>
-      <div class="tab-row">
-        <button type="button" class="tab-btn active" data-tab="mock">Mock Tests</button>
-        <button type="button" class="tab-btn" data-tab="practice">Practice</button>
+  <!-- ── KPI Stats Grid ── -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-title">Overall Accuracy</span>
+        <span class="kpi-icon">🎯</span>
+      </div>
+      <div class="kpi-value" id="kpi-overall-acc">0%</div>
+      <div class="kpi-sub" id="kpi-overall-counts">0 / 0 correct answers</div>
+      <div class="kpi-bar-bg">
+        <div class="kpi-bar-fill" id="kpi-overall-bar" style="width: 0%;"></div>
       </div>
     </div>
 
-    <div id="tab-mock" class="tab-panel">
-      <div id="mock-list" class="history-list"></div>
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-title">Mock Tests</span>
+        <span class="kpi-icon">📝</span>
+      </div>
+      <div class="kpi-value" id="kpi-mock-count">0</div>
+      <div class="kpi-sub" id="kpi-mock-sub">Avg: — · Best: —</div>
+      <div class="kpi-tag" id="kpi-mock-tag">100 Marks Full Papers</div>
     </div>
-    <div id="tab-practice" class="tab-panel hidden">
-      <div id="practice-list" class="history-list"></div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-title">Practice Solved</span>
+        <span class="kpi-icon">⚡</span>
+      </div>
+      <div class="kpi-value" id="kpi-practice-q">0</div>
+      <div class="kpi-sub" id="kpi-practice-acc">Accuracy: 0%</div>
+      <div class="kpi-tag" id="kpi-practice-tag">0 sessions completed</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-header">
+        <span class="kpi-title">Topics Covered</span>
+        <span class="kpi-icon">📊</span>
+      </div>
+      <div class="kpi-value" id="kpi-topics-active">0 / 15</div>
+      <div class="kpi-sub" id="kpi-topics-sub">Civil Engineering Syllabus</div>
+      <div class="kpi-tag kpi-tag--accent" id="kpi-topics-tag">Ready for Practice</div>
     </div>
   </section>
 
-  <!-- ── Data management ── -->
-  <section class="panel panel--data">
-    <div class="panel-header">
-      <h3 class="panel-title">Data Management</h3>
-    </div>
-    <div class="data-row">
+  <!-- ── Civil Engineering Topic Mastery Section ── -->
+  <section class="profile-section">
+    <div class="section-top-bar">
       <div>
-        <div class="data-title">Export progress</div>
-        <div class="data-sub">Download a JSON backup of your profile and history.</div>
+        <h2 class="section-heading">Topic-wise Syllabus Mastery</h2>
+        <p class="section-subheading">Track your strengths and identify subjects that need extra revision</p>
       </div>
-      <button type="button" class="secondary-btn" id="export-btn">Export JSON</button>
+      <div class="topic-filters" id="topic-filter-pills">
+        <button type="button" class="filter-pill active" data-filter="all">All (15)</button>
+        <button type="button" class="filter-pill" data-filter="strong">Strong (≥75%)</button>
+        <button type="button" class="filter-pill" data-filter="weak">Needs Work (&lt;50%)</button>
+        <button type="button" class="filter-pill" data-filter="untested">Untested</button>
+      </div>
     </div>
-    <div class="data-row">
-      <div>
-        <div class="data-title">Import progress</div>
-        <div class="data-sub">Restore from a JSON backup. This replaces the progress stored in this browser.</div>
-      </div>
-      <button type="button" class="secondary-btn" id="import-btn">Import JSON</button>
-      <input type="file" id="import-file" accept="application/json,.json" class="hidden">
+    <div id="topic-mastery-grid" class="topic-mastery-grid">
+      <!-- Injected by profile-page.js -->
     </div>
-    <div class="data-row">
+  </section>
+
+  <!-- ── History Section (Tabs for Mocks & Practice) ── -->
+  <section class="profile-section">
+    <div class="section-top-bar">
       <div>
-        <div class="data-title">Reset progress</div>
-        <div class="data-sub">Permanently delete your profile, mock results and practice history.</div>
+        <h2 class="section-heading">Attempt History &amp; Test Results</h2>
+        <p class="section-subheading">Every test attempt and practice set is preserved permanently</p>
       </div>
-      <button type="button" class="danger-btn" id="reset-btn">Reset</button>
+      <div class="history-tabs">
+        <button type="button" id="tab-btn-mock" class="history-tab-btn active">
+          📝 Mock Papers (<span id="mock-history-count">0</span>)
+        </button>
+        <button type="button" id="tab-btn-practice" class="history-tab-btn">
+          ⚡ Practice Sets (<span id="practice-history-count">0</span>)
+        </button>
+      </div>
+    </div>
+
+    <!-- Mock History Container -->
+    <div id="mock-history-panel" class="history-panel">
+      <div id="mock-history-list" class="history-list"></div>
+    </div>
+
+    <!-- Practice History Container -->
+    <div id="practice-history-panel" class="history-panel hidden">
+      <div id="practice-history-list" class="history-list"></div>
+    </div>
+  </section>
+
+  <!-- ── Data Management & Backup ── -->
+  <section class="profile-section data-mgmt-section">
+    <div class="section-top-bar">
+      <div>
+        <h2 class="section-heading">Data Management</h2>
+        <p class="section-subheading">Your results are stored safely in this browser. You can export or clear anytime.</p>
+      </div>
+      <div class="data-mgmt-actions">
+        <button type="button" id="export-data-btn" class="secondary-btn">💾 Backup / Export JSON</button>
+        <button type="button" id="reset-data-btn" class="danger-btn">🗑️ Reset Progress</button>
+      </div>
     </div>
   </section>
 
 </main>
 
+<!-- ── Edit Name Modal ── -->
+<div id="edit-name-modal" class="ob-overlay hidden">
+  <div class="ob-card">
+    <div class="ob-logo">✏️</div>
+    <h2 class="ob-title">Update Your Name</h2>
+    <p class="ob-sub">Change the name displayed on your scorecard and dashboard.</p>
+    <label class="ob-label" for="edit-name-input">Full Name</label>
+    <input id="edit-name-input" class="ob-input" type="text" maxlength="40" placeholder="e.g. Rahul Sharma" autocomplete="off">
+    <div style="display: flex; gap: 10px; margin-top: 18px;">
+      <button type="button" id="cancel-edit-btn" class="pill-btn pill-btn--ghost" style="flex:1;">Cancel</button>
+      <button type="button" id="save-name-btn" class="ob-btn" style="flex:1; margin-top:0;">Save Name</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
 <script src="js/config.js"></script>
 <script src="js/manifest.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/scoring.js"></script>
 <script src="data/topics.js"></script>
-<script src="data/2015.js"></script>
-<script src="data/2017_ce1.js"></script>
-<script src="data/2017_ce2.js"></script>
-<script src="data/2018_ce1.js"></script>
-<script src="data/2018_ce2.js"></script>
-<script src="data/2019_ce1.js"></script>
-<script src="data/2019_ce2.js"></script>
-<script src="data/2020_ce1.js"></script>
-<script src="data/2020_ce2.js"></script>
-<script src="data/2021_ce1.js"></script>
-<script src="data/2021_ce2.js"></script>
-<script src="data/2022.js"></script>
-<script src="data/2023.js"></script>
-<script src="data/2024.js"></script>
-<script src="data/2025_ce1.js"></script>
-<script src="data/2025_ce2.js"></script>
 <script src="js/profile.js"></script>
 <script src="js/onboarding.js"></script>
 <script src="js/profile-page.js"></script>
