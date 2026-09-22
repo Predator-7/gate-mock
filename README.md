@@ -4,43 +4,38 @@ A full-featured, client-side preparation platform for GATE Civil Engineering (CE
 
 ---
 
-## 🚀 Quick Start (Running Locally)
+## 🚀 Quick Start (Running Locally with Persistent Storage)
 
-Since this is a lightweight static web application (HTML, CSS, Vanilla JavaScript), no complex build steps or database installations are needed. You only need a local HTTP server so that assets, questions, and scripts load properly without browser `file://` CORS restrictions.
+The platform comes with a zero-dependency server that automatically persists your test scores, practice sessions, question-by-question verdicts, and profile data directly into a local file (**`userData.json`**).
 
-### Option 1: Using Python (Recommended)
-Python is pre-installed on most systems:
+### Option 1: Node.js (Recommended)
+No external npm dependencies required:
 ```bash
 # Clone the repository (if you haven't already)
 git clone https://github.com/Predator-7/gate-mock.git
 cd gate-mock
 
-# Start a local HTTP server
-python3 -m http.server 8080
+# Start the local server with automatic disk persistence
+npm start
+# or: node server.js
 ```
 Open your browser and navigate to: **`http://localhost:8080`**
 
-### Option 2: Using Node.js
+### Option 2: Python 3
+Python's built-in standard library server is also included:
 ```bash
-# Using npx (no install needed)
-npx serve . -l 8080
+python3 server.py
 ```
-Then open: **`http://localhost:8080`**
-
-### Option 3: VS Code Live Server
-1. Open the project folder in **Visual Studio Code**.
-2. Install the **Live Server** extension (Ritwick Dey).
-3. Right-click [`index.html`](file:///Users/anshgarewal/Desktop/GATE-MOck/index.html) and click **"Open with Live Server"**.
+Open your browser and navigate to: **`http://localhost:8080`**
 
 ---
 
-## 📖 How to Use the Platform
+## 💾 How User Data is Saved (File Persistence)
 
-### 1. First Visit & Onboarding
-- When you first visit the site, you'll be greeted with a simple onboarding modal.
-- Enter your name (e.g. *"Arjun Sharma"*).
-- Your profile avatar and personalized progress tracking will immediately activate in the top navigation bar across all pages.
-- **Privacy First**: No passwords or accounts required — 100% of your data stays private and stored directly in your browser (`localStorage`).
+- **Physical File Storage (`userData.json`)**: Whenever you submit a mock test, complete a practice session, or update your name, the app automatically writes your updated records directly to `userData.json` on your computer.
+- **Two-Way Sync**: When you open any page, the app automatically reads from `userData.json` to load your progress.
+- **Browser Fallback**: If the server is ever closed, browser `localStorage` acts as an automatic fallback so your progress is never lost.
+- **Git Protection**: `userData.json` is listed in `.gitignore` so your personal scores and answers are kept strictly private on your computer and never committed to GitHub. A template `userData.example.json` is provided.
 
 ### 2. Taking a Full-Length Mock Test
 1. From the **Mock Tests** home page ([`index.html`](file:///Users/anshgarewal/Desktop/GATE-MOck/index.html)), select any year paper (e.g., *GATE CE 2025 CE1*, *GATE CE 2021*, *GATE CE 2017*).
@@ -165,6 +160,12 @@ GATE-MOck/
 To run the automated integrity and test verification suites:
 
 ```bash
+# Run all test suites
+npm test
+
+# Verify local server and userData.json file persistence
+node tools/verify_server.js
+
 # Verify profile, scoring, mastery calculation and data backup/restore
 node tools/verify_profile.js
 

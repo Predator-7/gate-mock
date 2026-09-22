@@ -40,6 +40,7 @@
     var merged = Object.assign({}, existing, data, { updatedAt: Date.now() });
     if (!merged.createdAt) merged.createdAt = Date.now();
     safeSet(PROFILE_KEY, merged);
+    persistToDisk();
     return merged;
   }
 
@@ -177,6 +178,7 @@
     history.unshift(entry);
     if (history.length > 100) history = history.slice(0, 100);
     safeSet(MOCK_HIST_KEY, history);
+    persistToDisk();
     return entry;
   }
 
@@ -218,6 +220,7 @@
     history.unshift(record);
     if (history.length > 100) history = history.slice(0, 100);
     safeSet(PRAC_HIST_KEY, history);
+    persistToDisk();
     return record;
   }
 
@@ -540,6 +543,148 @@
         }
       }
     } catch(e) {}
+
+    persistToDisk();
+  }
+
+  /* ══════════════════════════════════════════
+     6. AUTOMATIC DISK FILE SYNC (userData.json)
+  ══════════════════════════════════════════ */
+  var diskSyncActive = false;
+  var lastDiskSyncTime = null;
+  var syncTimeout = null;
+
+  function isDiskSyncActive() {
+    return diskSyncActive;
+  }
+
+  function getLastDiskSyncTime() {
+    return lastDiskSyncTime;
+  }
+
+  function getFullDiskPayload() {
+    var attempts = {};
+    try {
+      if (typeof localStorage !== "undefined" && localStorage.length) {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k && (k.indexOf("gate_attempt_") === 0 || k.indexOf("gate-attempt-") === 0)) {
+            attempts[k] = safeGet(k);
+          }
+        }
+      }
+    } catch(e) {}
+
+    return {
+      profile: loadProfile(),
+      mockHistory: loadMockHistory(),
+      practiceHistory: loadPracticeHistory(),
+      attempts: attempts,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function persistToDisk() {
+    if (typeof fetch !== "function" || typeof window === "undefined" || !window.location) return;
+    if (window.location.protocol === "file:") return;
+    if (typeof setTimeout !== "function") return;
+
+    if (syncTimeout && typeof clearTimeout === "function") clearTimeout(syncTimeout);
+    syncTimeout = setTimeout(function () {
+      var payload = getFullDiskPayload();
+      fetch("/api/user-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error("Status " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        diskSyncActive = true;
+        lastDiskSyncTime = Date.now();
+        if (typeof window !== "undefined" && window.dispatchEvent) {
+          window.dispatchEvent(new CustomEvent("gate:diskSaved", { detail: { timestamp: lastDiskSyncTime } }));
+        }
+      })
+      .catch(function () {
+        // Silently continue if server is not listening
+      });
+    }, 200);
+  }
+
+  function syncWithDisk(callback) {
+    if (typeof fetch !== "function" || typeof window === "undefined" || !window.location) {
+      if (callback) callback(false);
+      return;
+    }
+    if (window.location.protocol === "file:") {
+      if (callback) callback(false);
+      return;
+    }
+
+    fetch("/api/user-data")
+      .then(function (res) {
+        if (!res.ok) throw new Error("Status " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data || typeof data !== "object") return;
+        diskSyncActive = true;
+        lastDiskSyncTime = Date.now();
+
+        // Hydrate profile
+        if (data.profile && typeof data.profile === "object" && data.profile.name) {
+          var currProf = loadProfile();
+          if (!currProf || !currProf.name || (data.profile.updatedAt && data.profile.updatedAt > (currProf.updatedAt || 0))) {
+            safeSet(PROFILE_KEY, data.profile);
+          }
+        }
+
+        // Hydrate mock history
+        if (Array.isArray(data.mockHistory) && data.mockHistory.length > 0) {
+          var currMocks = safeGet(MOCK_HIST_KEY) || [];
+          if (data.mockHistory.length >= currMocks.length) {
+            safeSet(MOCK_HIST_KEY, data.mockHistory);
+          }
+        }
+
+        // Hydrate practice history
+        if (Array.isArray(data.practiceHistory) && data.practiceHistory.length > 0) {
+          var currPrac = safeGet(PRAC_HIST_KEY) || [];
+          if (data.practiceHistory.length >= currPrac.length) {
+            safeSet(PRAC_HIST_KEY, data.practiceHistory);
+          }
+        }
+
+        // Hydrate in-progress attempts
+        if (data.attempts && typeof data.attempts === "object") {
+          Object.keys(data.attempts).forEach(function (k) {
+            if (data.attempts[k] && !safeGet(k)) {
+              safeSet(k, data.attempts[k]);
+            }
+          });
+        }
+
+        if (typeof window !== "undefined" && window.dispatchEvent) {
+          window.dispatchEvent(new CustomEvent("gate:diskSynced", { detail: data }));
+        }
+        if (callback) callback(true, data);
+      })
+      .catch(function (err) {
+        diskSyncActive = false;
+        if (callback) callback(false, err);
+      });
+  }
+
+  // Automatic sync on window boot
+  if (typeof window !== "undefined" && typeof document !== "undefined" && typeof fetch === "function") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function () { syncWithDisk(); });
+    } else if (typeof setTimeout === "function") {
+      setTimeout(function () { syncWithDisk(); }, 0);
+    }
   }
 
   /* ── Expose Globally ── */
@@ -562,7 +707,11 @@
     validateImport: validateImport,
     importData: importData,
     resetAll: resetAll,
-    resetAllData: resetAll
+    resetAllData: resetAll,
+    isDiskSyncActive: isDiskSyncActive,
+    getLastDiskSyncTime: getLastDiskSyncTime,
+    syncWithDisk: syncWithDisk,
+    persistToDisk: persistToDisk
   };
 
 })();

@@ -15,6 +15,7 @@
     renderTopicMastery();
     renderMockHistory();
     renderPracticeHistory();
+    updateDiskSyncUI();
     wireEventListeners();
   }
 
@@ -381,6 +382,24 @@
       });
     }
 
+    /* Sync with File Button */
+    var syncFileBtn = document.getElementById("sync-file-btn");
+    if (syncFileBtn) {
+      syncFileBtn.addEventListener("click", function () {
+        if (!window.GateProfile || !window.GateProfile.syncWithDisk) return;
+        syncFileBtn.textContent = "🔄 Syncing...";
+        window.GateProfile.syncWithDisk(function (success) {
+          syncFileBtn.textContent = "🔄 Sync with File";
+          updateDiskSyncUI();
+          if (success) {
+            alert("✅ Successfully synchronized with userData.json on disk!");
+          } else {
+            alert("ℹ️ Local server is not currently reachable at /api/user-data.\n\nTo save data to userData.json, run:\n  node server.js\nor\n  python3 server.py\n\n(Browser localStorage is still actively preserving your progress).");
+          }
+        });
+      });
+    }
+
     /* Export JSON */
     var exportBtn = document.getElementById("export-data-btn");
     if (exportBtn) {
@@ -412,5 +431,41 @@
       });
     }
   }
+
+  /* ─────────────────────────────────────────────────────────────
+     7. Disk Sync Status UI
+     ───────────────────────────────────────────────────────────── */
+  function updateDiskSyncUI() {
+    var dot = document.getElementById("disk-sync-dot");
+    var text = document.getElementById("disk-sync-text");
+    if (!dot || !text || !window.GateProfile) return;
+
+    var isActive = window.GateProfile.isDiskSyncActive ? window.GateProfile.isDiskSyncActive() : false;
+    var lastSync = window.GateProfile.getLastDiskSyncTime ? window.GateProfile.getLastDiskSyncTime() : null;
+
+    if (isActive) {
+      dot.style.background = "#4caf50";
+      dot.style.boxShadow = "0 0 8px rgba(76,175,80,0.6)";
+      var timeStr = lastSync ? " (synced " + new Date(lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ")" : "";
+      text.innerHTML = "<strong>File Persistence Active:</strong> your progress is safely saved in <code style=\"color:var(--accent-b);\">userData.json</code>" + timeStr;
+    } else {
+      dot.style.background = "#42a5f5";
+      dot.style.boxShadow = "none";
+      text.innerHTML = "<strong>Browser Storage Active:</strong> run <code style=\"color:var(--accent-b);\">node server.js</code> or <code style=\"color:var(--accent-b);\">npm start</code> to auto-sync with <code style=\"color:var(--accent-b);\">userData.json</code>";
+    }
+  }
+
+  window.addEventListener("gate:diskSynced", function () {
+    renderProfileHeader();
+    renderKPIs();
+    renderTopicMastery();
+    renderMockHistory();
+    renderPracticeHistory();
+    updateDiskSyncUI();
+  });
+
+  window.addEventListener("gate:diskSaved", function () {
+    updateDiskSyncUI();
+  });
 
 })();

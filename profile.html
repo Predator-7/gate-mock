@@ -150,10 +150,15 @@
   <section class="profile-section data-mgmt-section">
     <div class="section-top-bar">
       <div>
-        <h2 class="section-heading">Data Management</h2>
-        <p class="section-subheading">Your results are stored safely in this browser. You can export or clear anytime.</p>
+        <h2 class="section-heading">Data Management &amp; File Persistence</h2>
+        <p class="section-subheading">Your results are stored in <code style="color:var(--accent-b);background:var(--surface3);padding:2px 6px;border-radius:4px;">userData.json</code> on your computer &amp; browser storage.</p>
+        <div id="disk-sync-status" style="margin-top:10px;font-size:12.5px;display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:99px;background:var(--surface2);border:1px solid var(--border);">
+          <span id="disk-sync-dot" style="width:8px;height:8px;border-radius:50%;background:#ffa726;display:inline-block;"></span>
+          <span id="disk-sync-text">Checking file persistence status...</span>
+        </div>
       </div>
       <div class="data-mgmt-actions">
+        <button type="button" id="sync-file-btn" class="secondary-btn">🔄 Sync with File</button>
         <button type="button" id="export-data-btn" class="secondary-btn">💾 Backup / Export JSON</button>
         <button type="button" id="reset-data-btn" class="danger-btn">🗑️ Reset Progress</button>
       </div>

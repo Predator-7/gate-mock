@@ -1,0 +1,19 @@
+{
+  "name": "gate-mock",
+  "version": "1.0.0",
+  "description": "GATE Civil Engineering Mock Test & Practice Platform with Local File Persistence",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server:py": "python3 server.py",
+    "test": "node tools/verify_server.js && node tools/verify_profile.js && node tools/verify_pages.js && node tools/verify_profile_page.js"
+  },
+  "keywords": [
+    "gate",
+    "civil-engineering",
+    "mock-test",
+    "gate-ce"
+  ],
+  "author": "Predator-7",
+  "license": "MIT"
+}
