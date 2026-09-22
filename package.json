@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "server:py": "python3 server.py",
-    "test": "node tools/verify_server.js && node tools/verify_profile.js && node tools/verify_pages.js && node tools/verify_profile_page.js && node tools/verify_palette_colors.js"
+    "test": "node tools/verify_server.js && node tools/verify_profile.js && node tools/verify_pages.js && node tools/verify_profile_page.js && node tools/verify_palette_colors.js && node tools/verify_2016.js && node tools/verify_2017.js"
   },
   "keywords": [
     "gate",
