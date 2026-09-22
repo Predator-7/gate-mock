@@ -312,15 +312,23 @@
       else topicMap[t].skipped++;
     });
 
+    var topicKeys = Object.keys(topicMap);
+    var topicNames = topicKeys.map(function (k) {
+      var meta = window.GATE_TOPICS ? window.GATE_TOPICS.get(k) : null;
+      return meta ? meta.name : k;
+    });
+
     window.GateProfile.savePracticeSession({
       type: "practice",
-      topics: Object.keys(topicMap).map(function (k) { return topicMap[k]; }),
+      topics: topicKeys,
+      topicNames: topicNames,
+      topicBreakdown: topicMap,
       correct: stats.correct,
       wrong: stats.wrong,
       skipped: stats.skipped,
       score: stats.score,
       total: items.length,
-      completedAt: Date.now()
+      submittedAt: Date.now()
     });
   }
 

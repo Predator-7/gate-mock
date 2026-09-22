@@ -58,6 +58,28 @@
     /* start */
     document.getElementById("start-practice-btn").addEventListener("click", startPractice);
 
+    /* Check for topic pre-selection via URL parameter (e.g. from Profile page) */
+    var params = new URLSearchParams(window.location.search);
+    var topicParam = params.get("topic") || params.get("topics");
+    if (topicParam) {
+      var requestedTopics = topicParam.split(",").map(function(s){ return s.trim(); });
+      selectedTopics.clear();
+      document.querySelectorAll(".topic-card").forEach(function (c) {
+        var tid = c.dataset.topic;
+        if (requestedTopics.indexOf(tid) !== -1) {
+          selectedTopics.add(tid);
+          c.classList.add("selected");
+        } else {
+          c.classList.remove("selected");
+        }
+      });
+      updatePreview();
+      setTimeout(function() {
+        var startBar = document.getElementById("start-bar");
+        if (startBar) startBar.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    }
+
     /* initial state – select all topics, all years */
     document.getElementById("select-all-btn").click();
 
